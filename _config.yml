@@ -14,7 +14,7 @@ author:
   name: Philip Cho # author name
   bio: >- # tell to the world
     Machine Learning Engineer, Python specialist, and a soccer player. This is a portfolio website that shows everything I code, study, and love. 
-    <a href="https://github.com/chophilip21" target="_blank" rel="noopener">@Github</a>.
+    <a href="https://github.com/chophilip21" target="_blank" rel="noopener">@Github</a> <a href="https://www.linkedin.com/in/pycho/" target="_blank" rel="noopener">@LinkedIn</a>.
   username: chophilip21 # general username
   github: chophilip21 # github username
   email: chophilip21@gmail.com # email adress
@@ -58,7 +58,7 @@ jekyll_compose:
     description:
 
 # Homepage limit posts
-number_of_posts: 5
+number_of_posts: 7
 
 # Build settings
 # theme: klise
