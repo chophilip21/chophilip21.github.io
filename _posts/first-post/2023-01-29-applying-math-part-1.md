@@ -23,6 +23,8 @@ Most of us use `Numpy` in a daily basis but few of us really think about the rea
 Furthermore, we always deal with N-dimensional arrays in ML, and Numpy offers extremely memory efficient array representation, and convenient array based operations which makes mathematical computations very straight forward. 
 
  
+#TODO Add time difference
+
 ```py
 def test():
     return 100, "foo"
