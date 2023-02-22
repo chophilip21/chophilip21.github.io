@@ -1,24 +1,20 @@
 ---
 layout: post
-title: Cara ribet memperbarui forked repo
-date: 2020-01-29 01:00 +0700
-modified: 2020-03-07 16:49:47 +07:00
-description: Ada dua cara untuk memperbarui forked repository menggunakan web interface yang disediakan oleh github tapi ribet, atau melalui terminal yang lebih ribet lagi.
+title: Applying basic math concepts using Numpy-Part 1
+date: 2023-01-29 01:00 +0700
+modified: 2023-02-21 16:49:47 +07:00
+description: Learn how to apply basic mathematics operations using Python library
 tag:
-  - tips
-  - git
-  - software
-image: /cara-memperbarui-fork-repository/repo.png
+  - math
+  - python
+  - basics
+  - numpy
+image: https://img.freepik.com/free-vector/chalkboard-with-math-elements_1411-88.jpg
 ---
 
-Berawal dari saya pengen memperbarui repo yang tua dari suatu organisasi, niatnya pengen rumat ulang nih, ternyata dari orginal reponya ada update, sekalian buat artikel deh, lebih kurang gambaranya seperti ini.
+Machine Learning (ML) applications are most commonly written in Python, but every single concepts involoved in it is based on Mathematics. Math is the engine of ML application, and the Python codes are its wheels. Without knowing them both in detail, all the way from the fundamentals, you cannot say that you are truly a ML Engineer. On these blog mosts related to basics, I aim to explain basic Linear Algebra, Probability concepts, and then solidify the understanding by applying some of the popular libraries like `Numpy`, `Scipy` and `Pytorch`, which are most widely used in this field.             
 
-<figure>
-<img src="{{ page.image }}" alt="ilustrasi repo yang mau diupdate">
-<figcaption>Fig 1. Gambaran ribetnya.</figcaption>
-</figure>
-
-Ada dua cara untuk memperbarui forked repository menggunakan web interface yang disediakan oleh github tapi ribet, atau melalui terminal yang lebih ribet lagi.
+The code that are used in this repository will go into this [notebook](_posts/first-post/matrices.ipynb)
 
 ### Melalui Github (boring way) 💻
 
