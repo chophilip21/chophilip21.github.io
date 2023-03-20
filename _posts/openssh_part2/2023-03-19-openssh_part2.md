@@ -33,22 +33,31 @@ You can choose to connect via `public IP`, which is like concierage in the build
 So you need to set some rules for your concierage. This is called `port forwarding`. This essentially makes the public address that can be obtained via below command-- 
 
 ```bash
-$ wget -qO- ifconfig.co
+$ wget -qO- ifconfig.co 
+$ curl https://ipinfo.io/ip
 ```
 
-To directly forward the traffic to specific port. This is also referred to as `SSH tunneling`. 
+To directly forward the traffic to specific port. This is also referred to as `SSH tunneling`. By the length of the IP address, you should be able to tell if you are looking at IPv4 or IPv6. 
+
+<figure>
+<img src="https://www.tommycoolman.com/wp-content/uploads/2021/08/ssh-tunneling-01-1024x203.jpg" alt="openssh">
+<figcaption>Port forwarding instructions</figcaption>
+</figure>
+
+Here are the conditions. 
+
+- Use local forwarding `-L` flag.
+- Use arbitrary port `8888` for the client
+- RDP port is `3389`. You need to unlock firewall here. 
+- Public IP address is `108.172.172.229,` 
+- my private address is `192.168.1.67`. 
+- The server is only listening to port `1993`, not the default 22.
+-
 
 ```bash
-$ ssh -L local_port:destination_server_ip:remote_port ssh_server_hostname
+
+ssh -L 8888:192.168.1.67:3389 chophilip21@108.172.172.229 -p 1993
 ```
-
-An example of this would be:
-
-```bash
-$ ssh –L 5901:188.17.0.5:4492 pnap@ssh.server.com
-```
-
-For more information about forwarding, refer to [this article](https://phoenixnap.com/kb/ssh-port-forwarding)
 
 ## 1.2 - Using VPN
 
@@ -59,7 +68,7 @@ Unlike File Transfer Protocol (FTP), which only enables you to upload, delete, a
 <figcaption>To do port forwarding, firewall needs to be configured, making the security weaker.</figcaption>
 </figure>
 
-Under normal circumstances, your network is configured to restrict the ability to access most of these ports from the outside internet. Exposing certain ports to the internet means exposing your network to hacking and all the nasty surprises that come along with it.
+Under normal circumstances, your network is configured to restrict the ability to access most of these ports from the outside internet. Exposing certain ports to the internet means exposing your network to hacking and all the nasty surprises that come along with it. Port Forwarding does its job, but you can't deny the fact that it has greater risks.
 
 And there is alternative, which is setting up `VPN`. It allows your **computer outside the network to behave as if it was inside the network**. Yes, this sets up additional layer of work, but this establihes additional layer of security and now you can **connect directly via private ip address without having to expose any ports on your router to internet**. 
 
