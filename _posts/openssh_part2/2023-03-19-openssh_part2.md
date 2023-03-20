@@ -44,20 +44,7 @@ To directly forward the traffic to specific port. This is also referred to as `S
 <figcaption>Port forwarding instructions</figcaption>
 </figure>
 
-Here are the conditions. 
 
-- Use local forwarding `-L` flag.
-- Use arbitrary port `8888` for the client
-- RDP port is `3389`. You need to unlock firewall here. 
-- Public IP address is `108.172.172.229,` 
-- my private address is `192.168.1.67`. 
-- The server is only listening to port `1993`, not the default 22.
--
-
-```bash
-
-ssh -L 8888:192.168.1.67:3389 chophilip21@108.172.172.229 -p 1993
-```
 
 ## 1.2 - Using VPN
 
