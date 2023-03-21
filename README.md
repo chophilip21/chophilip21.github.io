@@ -1,3 +1,7 @@
+This is a repository built with Klise that uses `Jekyll`. 
+
+In order to run the templates, you need to have `Jekyll` [installed with Ruby and Bundler first](https://jekyllrb.com/)
+
 # Klisé
 
 Klisé is minimalist Jekyll theme for running a personal site and blog running on Jekyll.<br>
