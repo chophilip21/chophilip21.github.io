@@ -80,4 +80,32 @@ Ngrok does not require VPN or port-forwarding. Ngrok Secure Tunnels work by usin
 
 # Configuring Ngrok
 
-Okay now let's dive into Ngrok configuration. 
+Now let's dive into Ngrok. I'm on Debian, so I will download mine according to terminal [instructions](https://ngrok.com/download):
+
+```bash
+# If you have not done it yet, download openssh-server and start
+$ sudo apt install openssh-server
+$ sudo service ssh start
+
+#donwload the Ngrok files and extract
+$ wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
+$ sudo tar xvzf ./ngrok-v3-stable-linux-amd64.tgz -C /usr/local/bin
+
+# add auth token
+$ ngrok config add-authtoken $AUTH_TOKEN
+
+# run ngrok server
+$ ngrok tcp 22
+```
+
+The server is up and running. You will see stuff like:
+
+`Forwarding: tcp://18.tcp.ngrok.io:999999 -> localhost:22`  
+
+You can choose to add public key to the client, or you can choose to install same Ngrok client and authenticate just like how you authenticated the server.  
+
+```bash
+$ ssh chophilip21@18.tcp.ngrok.io -p999999
+```
+
+It's simple as that! Now you have successfully connected remote PC via Ngrok secure tunnel. 
