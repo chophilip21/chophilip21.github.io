@@ -14,7 +14,7 @@ As a Machine Learning/Data Engineer, I am in charge of designing and maintaining
 <figcaption>A typical ETL pipeline</figcaption>
 </figure>
 
-The pool of image data typically resides in the local NAS storage, and they often require to be copied over to the cloud storage (AWS S3), and it's metadata needs to be extracted and mapped to the relational database. Because of the sheer volume of the data, and I/O and CPU bound limitations, it's impossible to process everything in a single process as it would take forever. Having an eifficient and stable `multiprocessing` pipleine is critical, but I have been relying on legacy codes to get by, without having a solid understanding behind it. For example:
+The pool of image data typically resides in the local NAS storage, and they often require to be copied over to the cloud storage (AWS S3), and its metadata needs to be extracted and mapped to the relational database. Because of the sheer volume of the data, and I/O and CPU bound limitations, it's impossible to process everything in a single process as it would take forever. Having an eifficient and stable `multiprocessing` pipleine is critical, but I have been relying on legacy codes to get by, without having a solid understanding behind it. For example:
 - How is `multiprocessing.pool` different from `concurrent.futures`? 
 - How does `threading` work in Python? 
 - How do you ensure there is no `race condition`, `deadlock` or `Starvation`?
