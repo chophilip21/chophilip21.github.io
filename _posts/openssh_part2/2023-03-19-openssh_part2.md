@@ -117,8 +117,7 @@ $ sudo apt install openssh-server
 $ sudo service ssh start
 
 #donwload the Ngrok files and extract
-$ wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
-$ sudo tar xvzf ./ngrok-v3-stable-linux-amd64.tgz -C /usr/local/bin
+$ curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null && echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list && sudo apt update && sudo apt install ngrok
 
 # add auth token
 $ ngrok config add-authtoken $AUTH_TOKEN
@@ -127,7 +126,13 @@ $ ngrok config add-authtoken $AUTH_TOKEN
 $ ngrok tcp 22
 ```
 
-The server is up and running. You will see stuff like:
+Here you have multiple protocol options to use [HTTP, TLS, TCP, and SSH Reverse tunnel](https://ngrok.com/docs/secure-tunnels/tunnels/http-tunnels/). 
+- HTTP protocols are typically used for websites, RESTful APIs, web servers, websockets, and much more.
+- TLS (Transport Layer Security) tunnels are more secure version of HTTP tunnels, using encryption approach. Essentially this is HTTPS. 
+- HTTP is a One-way communication system, while on the other hand, TCP is a 3-Way Handshake. TCP. This is commonly used to expose SSH, game servers, databases and more
+- SSH reverse tunneling is an alternative mechanism to start an ngrok tunnel without needing to download or run the ngrok agent. You can start tunnels via SSH without downloading an ngrok agent by running an SSH reverse tunnel command.
+
+For my simple use case (we aren't building an application here), there is no reason to go for options besides `TCP`. The server is up and running. You will see stuff like:
 
 `Forwarding: tcp://18.tcp.ngrok.io:999999 -> localhost:22`  
 
