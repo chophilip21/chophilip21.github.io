@@ -9,14 +9,20 @@ image: "/openssh_part2/How-port-forwading-works-1.jpg"
 
 # 1.0 - SSH Connection Error. WHY?
 
-In the [first part of the post](https://chophilip21.github.io/openssh), I have presented what I learned about the basics of SSH server. Unfortunately when you are outside of your home network, the SSH connection will fail.
-SSH access commands that worked at home when you were testing, will return `connection refused` or `connection timeout`, despite credentials remaining the same, and the server/port still remaining open. <b>Why is this happening?</b>
+In the [first part of the post](https://chophilip21.github.io/openssh), I have presented what I learned about the basics of SSH server. Unfortunately when you are outside of your home network, the SSH connection will fail. SSH access commands that were functioning at home will suddenly return `connection refused` or `connection timeout`, despite credentials remaining the same, and the server/port still remaining open. <b>Why is this happening?</b>
 
 ## 1.1 - Port forwarding
 
-By the time I started researching `port forwarding`, I realized that I am stepping into the areas of network programming, which I never really had much expousures in the past. Computer networking alone has enough contents to fill up university level course, and having a deep understanding of this area is difficult without dedicating extensive amount of time. But the idea of port-forwarding isn't too difficult to grasp at a high level. 
+To understand what is going on, you need to learn a bit about `Computer Networking`. Computers pass information over the network in the format of `IP packet`
 
-Devices in the same network can communicate with each other internally via private IP addresses, because they are like neighbors living in the same building. If you need to talk to your neighbor, you can just walk up to their doors and knock. 
+<figure>
+<img src="https://cdn.kastatic.org/ka-perseus-images/337190cba133e19ee9d8b5878453f915971a59cd.svg" alt="openssh">
+<figcaption>You can think of IP packets like postal letters</figcaption>
+</figure>
+
+Each IP packet contains both a header (20 or 24 bytes long) and data (variable length). The header includes the IP addresses of the source and destination, plus other fields that help to route the packet. Networking protocols split each message into multiple small packets, and ensures that large messages can safely go through physical network connections via protocols like `TCP`, which would not be discussed in this post. IP packets must have IP headers that contain source and destination IP addresses, so that messages get delivered correctly. 
+
+Devices in the same network can freely pass IP packets with each other internally via private IP addresses, because they are like neighbors living in the same building. If you need to talk to your neighbor, you can just walk up to their doors and knock. 
 
 <figure>
 <img src="https://media.geeksforgeeks.org/wp-content/uploads/20220517111808/privateip1.jpg" alt="openssh">
@@ -32,8 +38,7 @@ Remote traffic, however, aren't neighbors. They can be seen as a deliveryman com
 
 So you need to set some rules for your concierage. This is called `port forwarding`.
 
-
-## 1.2 - SSH via Ipv6
+## 1.2 - IpV4 Local Forwarding: configuring routers/firewalls
 
 **If you are on IPv6, there is no need for port-forwarding**. This is because IPv6 contains the full address of your device, which does not sit behind NAT. But as I have discussed in the previous post, IPv6 is not a global standard yet, and unless both your home internet connection and remote internet connection fully support IPv6, you will not be able to connect directly via IPv6. 
 
@@ -51,34 +56,37 @@ Above must return valid IpV6 on both [side](https://medium.com/@byteshiva/how-to
 </figure>
 
 
-
-
-## 1.3 - IpV4 Local Forwarding: configuring routers/firewalls. 
-
 **If your network is only using IPv4, you need port-forwarding**.
 
-`Local forwarding` is used to forward a port from the client machine to the server machine. Basically, the SSH client listens for connections on a configured port, and when it receives a connection, it tunnels the connection to an SSH server. The server connects to a configurated destination port, possibly on a different machine than the SSH server. There are other types of forwarding like `remote forwarding` and `dynamic port forwarding`, which is not necessary and thus will not be discussed here. 
+`Port forwarding` is used to forward a port from the client machine to the server machine. Basically, the SSH client listens for connections on a configured port, and when it receives a connection, it tunnels the connection to an SSH server. The server connects to a configurated destination port, possibly on a different machine than the SSH server. There are several types of forwarding like `local port forwarding`, `remote forwarding` and `dynamic port forwarding`, which will not be discussed here, because I have direct access to configuring the router, and all we want to acheive is simple one-way ssh connection. If you need to read more about different types of forwarding, refer to this [article](https://cybernews.com/what-is-vpn/port-forwarding/).
 
 In order to do local forwarding, you need to configure router, which is your concierage. It needs to know which devices to redirect the traffic when a request comes into a spefific port designated by the user (mapping an external port to an internal IP address and port). 
 
 <figure>
-<img src="https://portforward.com/what-is-port-forwarding-large.webp" alt="port forwarding">
-<figcaption>Every provider would have different instructions.</figcaption>
+<img src="https://i0.wp.com/networkustad.com/wp-content/uploads/2019/10/Port-Forwarding-configuration.png" alt="port forwarding">
+<figcaption>Routers on the server must be configured to accept the connections</figcaption>
 </figure>
 
-Every ISP provider will have there own system of opening up ports. But generally the rule of thumb is that you do not open more ports than you need. 
+Every ISP provider will have there own system of opening up ports. But generally the rule of thumb is that you do not open more ports than you need. I am using Telus Network, and I was able to find instructions to configure port forwarding easily from the user manual. The page looked something like this:
 
 <figure>
-<img src="https://www.tommycoolman.com/wp-content/uploads/2021/08/ssh-tunneling-01-1024x203.jpg" alt="port forwarding">
-<figcaption>Port forwarding instructions. Port 3389 needs to be opened up.</figcaption>
+<img src="./port-warding.png" alt="port forwarding">
+<figcaption>Changing ports can be very easy if you have admin access, but some providers may not provide this option</figcaption>
 </figure>
 
-In order to do the port-forwarding, the remote port `3389` also needs to be open to the public over the firewall, via commands like below:
+All I have to do was to select my server device, and give the ports that it needs to know to correctly redirect the traffic. There are other protocol options like UDP, which does not make sense for private SSH purposes. We want reliable TCP based connections. Once everything is configured, we can execute ssh commands against the public IP address of our server. 
+
+```bash
+$ ssh {id}@{public_ip} -p {port listening}
+```
+
+In order to do the port-forwarding, you may need to open firewalls on some ports, which can be done easily by commands like below:
 
 ```bash
 $ sudo ufw allow 3389/tcp
 ```
 
+That's it! once you understand how it works, everything is very easy. 
 
 # 2.0 - Using VPN
 
