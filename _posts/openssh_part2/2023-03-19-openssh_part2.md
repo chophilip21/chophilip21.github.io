@@ -38,9 +38,9 @@ Remote traffic, however, aren't neighbors. They can be seen as a deliveryman com
 
 So you need to set some rules for your concierage. This is called `port forwarding`.
 
-## 1.2 - IpV4 Local Forwarding: configuring routers/firewalls
+## 1.2 - IpV4 based Forwarding: configuring routers/firewalls
 
-**If you are on IPv6, there is no need for port-forwarding**. This is because IPv6 contains the full address of your device, which does not sit behind NAT. But as I have discussed in the previous post, IPv6 is not a global standard yet, and unless both your home internet connection and remote internet connection fully support IPv6, you will not be able to connect directly via IPv6. 
+**If you are on IPv6, there is no need for port-forwarding**. This is because IPv6 contains the full address of your device, which does not sit behind NAT. But as I have discussed in the previous post, IPv6 is not a global standard yet, and unless both your home internet connection and remote internet connection fully support IPv6, you will not be able to connect directly via IPv6. Even if your computer is routable, it does not mean it's reachable, so you may need to work on unblocking firewalls. 
 
 First checkout your IPv6 (make sure you can run ifconfig.)
 
@@ -86,11 +86,13 @@ In order to do the port-forwarding, you may need to open firewalls on some ports
 $ sudo ufw allow 3389/tcp
 ```
 
-That's it! once you understand how it works, everything is very easy. 
+That's it! once you understand how it works, everything is very easy.
+
+**Note:** Watch out for your public IPs changing. When router disconnects and reconnects, it re-registers to network and therefore makes changes to the IP address. 
 
 # 2.0 - Using VPN
 
-There are multiple ways to tackle the SSH problems, and each methods have its own pros and cons. And one of the obvious risks for port-forwarding, is `security` aspect. Unlike File Transfer Protocol (FTP), which only enables you to upload, delete, and edit files on your server, SSH can accomplish a wide range of tasks, and therefore has much higher risks. 
+There are multiple ways to tackle the SSH problems, and each methods have its own pros and cons. And one of the obvious risks for port-forwarding, is the `security` aspect. Unlike File Transfer Protocol (FTP), which only enables you to upload, delete, and edit files on your server, SSH can accomplish a wide range of tasks, and therefore has much higher risks. 
 
 <figure>
 <img src="/openssh_part2/How-port-forwading-works-1.jpg" alt="openssh">
@@ -99,12 +101,14 @@ There are multiple ways to tackle the SSH problems, and each methods have its ow
 
 Under normal circumstances, your network is configured to restrict the ability to access most of these ports from the outside internet. Exposing certain ports to the internet means exposing your network to hacking and all the nasty surprises that come along with it. Port Forwarding does its job, but you can't deny the fact that it has greater risks.
 
-And there is alternative, which is setting up `VPN`. It allows your **computer outside the network to behave as if it was inside the network**. This sets up additional layer of work, but this establihes additional layer of security and now you can **connect directly via private ip address without having to expose any ports on your router to internet**. You can use tools like [openvpn](https://openvpn.net/) to setup a VPN server, but cons of this approach would be increased complexity in the entire process. I figured that this is a overkill for the tasks that I am trying to acheive.  
+And there is alternative, which is setting up `VPN`. It allows your **computer outside the network to behave as if it was inside the network**. This sets up additional layer of work, but this establihes additional layer of security and now you can **connect directly via private ip address without having to expose any ports on your router to internet**. You can use tools like [openvpn](https://openvpn.net/) to setup a VPN server, but cons of this approach would be increased complexity in the entire process. This will be discussed further in detail, [on the next post](https://chophilip21.github.io/openssh_part3/).
 
 
 # 3.0 - Ngrok, Tailscale
 
-Well there are easier options too. Options like [Ngork](https://ngrok.com/) and [Tailscale](https://tailscale.com/blog/tailscale-ssh/) are 3rd party applications that does this for you. Ngrok, for example, exposes local servers behind Network Address Translation (NAT) and firewalls to the public over secure tunnels. Ngrok Secure Tunnels allow you to instantly open access to remote systems without touching any of your network settings or opening any ports on your router. This means you get a secure, reliable tunnel for your developer box, IoT device, or just about anything that has access to the internet.
+Well are there any easier 3rd party solutions?
+
+Options like [Ngork](https://ngrok.com/) and [Tailscale](https://tailscale.com/blog/tailscale-ssh/) are 3rd party applications that does this for you. Ngrok, for example, exposes local servers behind Network Address Translation (NAT) and firewalls to the public over secure tunnels. Ngrok Secure Tunnels allow you to instantly open access to remote systems without touching any of your network settings or opening any ports on your router. This means you get a secure, reliable tunnel for your developer box, IoT device, or just about anything that has access to the internet.
 
 
 <figure>
