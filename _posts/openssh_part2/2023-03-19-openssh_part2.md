@@ -88,7 +88,9 @@ $ sudo ufw allow 3389/tcp
 
 That's it! once you understand how it works, everything is very easy.
 
-**Note:** Watch out for your public IPs changing. When router disconnects and reconnects, it re-registers to network and therefore makes changes to the IP address. 
+## 1.3 Ensure that your Public IP does not change
+
+**Note:** Watch out for your public IPs changing. When router disconnects and reconnects, it re-registers to network and therefore makes changes to the IP address. This would become a problem when your network reboots while you are far away from your computer. You will have no idea what your new IP address is, and you will not be able to SSH into your computer until you come back home and look for the changes. Therefore instead of dynamic address, it is more convenient to have a static ip address. If you have access to the router settings, this can be easily configured. But we aware, if your address is static, your computer may be more vulnerable against external attacks. 
 
 # 2.0 - Using VPN
 
