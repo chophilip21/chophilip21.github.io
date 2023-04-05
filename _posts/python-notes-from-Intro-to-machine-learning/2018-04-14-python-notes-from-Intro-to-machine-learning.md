@@ -1,11 +1,24 @@
 ---
-title: Python Notes from Intro to Machine Learning
+title: Klise blog post guidelines
 date: 2018-04-14 10:00:00 +07:00
 tags: [python, machine-learning]
 description: Notes and code snippets of Python that I've been collecting so far throughout the "Intro to Machine Learning" course.
+usemathjax: true
 ---
 
 **This article is for Demo purpose**
+
+$$ 
+\begin{align*}
+y = y(x,t) &= A e^{i\theta} \\
+&= A (\cos \theta + i \sin \theta) \\
+&= A (\cos(kx - \omega t) + i \sin(kx - \omega t)) \\
+&= A\cos(kx - \omega t) + i A\sin(kx - \omega t)  \\
+&= A\cos \Big(\frac{2\pi}{\lambda}x - \frac{2\pi v}{\lambda} t \Big) + i A\sin \Big(\frac{2\pi}{\lambda}x - \frac{2\pi v}{\lambda} t \Big)  \\
+&= A\cos \frac{2\pi}{\lambda} (x - v t) + i A\sin \frac{2\pi}{\lambda} (x - v t)
+\end{align*}
+$$
+
 
 The article was originally on [this repo](https://github.com/risan/risanb.com/blob/master/content/posts/python-notes-from-intro-to-machine-learning/index.md)
 
