@@ -20,6 +20,7 @@ usemathjax: true
 - [HTTP (Persistent vs None-Persistent)](#persist)
 - [DNS (Domain Name System)](#DNS)
 - [DNS Records and Messages](#dns_messages)
+- [DNS Records Insertion and Propagation](#dns_insert)
 
 While studying the basics of networking in the [previous post](https://chophilip21.github.io/openssh_part2/), I realized that there are much more underlying contents related to it that I must know as a professional software engineer. At universities, it usually takes more than one semesters two fully cover all the essential topics related to networking, something that I missed as I did not study computer science for my undergraduate studies. I wanted to fill up this gap of knowledge, and my colleague recommended ["Computer Networking: A Top-Down Approach"](http://gaia.cs.umass.edu/kurose_ross/online_lectures.htm) by James F.Kurose and Keith W.Ross. I will be summarizing the core ideas that are relevant to me, and adding my thoughts to it in the next few blog posts.
 
@@ -189,6 +190,11 @@ The idea is simple, but how does DNS work exactly?
 <figcaption>The idea of DNS is like querying a database</figcaption>
 </figure>
 
+```bash
+https://chophilip21.github.io/network_part1/
+```
+Here, HTTPS is the protocol, chophilip21.github.io is the domain, and network_part1 is the subdomain. 
+
 A typical interaction would be like the following:
 
 1. Client requests to access [chophilip21.github.io.](https://chophilip21.github.io/) from internet browser
@@ -201,28 +207,57 @@ Input and output is very clear, but what actually happens under each step is act
 
 - **A. Root DNS server**: 13 root servers managed by 12 organizations. There are 1000 copies of root servers over the world.  
 - **B. Top-level domain (TLD) server**: For each root, top level domains like `com, org, net, edu, gov` have TLD server clusters
-- **C. Authoritative DNS server**: final holder of the IP of the domain you are looking for (<i>These are the guys like cloudflare, Quad9, Google, etc</i>)
+- **C. Authoritative DNS server**: final holder of the IP of the domain you are looking for (<i>These the servers that actually stores type A, NS, CNAME records.</i>)
 - **D. Local DNS server**: Caches the IP address locally so that it doesn't have to go through ABC all the time. 
 
-So it's like search for library > search for the shelf > search for position of the book in the shelf. The data is recursively loaded back to the client from the bottom. 
+So it's like search for library > search for the shelf > search for position of the book in the shelf. The data is recursively loaded back to the client from the bottom. Why only 13 root servers? It's because of the limitation of IPv4 standard and the DNS infrastructure in each 512 byte UDP packet. For more info about this, refer to this [post](https://www.quora.com/Why-are-there-only-13-servers-about-DNS-top-level-in-the-world)
 
 Okay things are starting to make much more sense! 
 
 ## 3.1 - DNS Records and Messages <a name="dns_messages"></a>
 
-DNS resource records are saved as tuples
-
-{% highlight markdown %}
-usemathjax: true
-{% endhighlight %}
+DNS resource records are saved as tuples that contains following values:
 
 $$ 
 \begin{align*}
-y = y(x,t) &= A e^{i\theta} \\
-&= A (\cos \theta + i \sin \theta) \\
-&= A (\cos(kx - \omega t) + i \sin(kx - \omega t)) \\
-&= A\cos(kx - \omega t) + i A\sin(kx - \omega t)  \\
-&= A\cos \Big(\frac{2\pi}{\lambda}x - \frac{2\pi v}{\lambda} t \Big) + i A\sin \Big(\frac{2\pi}{\lambda}x - \frac{2\pi v}{\lambda} t \Big)  \\
-&= A\cos \frac{2\pi}{\lambda} (x - v t) + i A\sin \frac{2\pi}{\lambda} (x - v t)
+(Name, Value, Type, TTL)
 \end{align*}
 $$
+
+- `TTL` is the time to live of the resource record. it determines when a resource should be removed from a cache.
+- If `Type==A`, then Value is IP address for the requested hostname (relay1.bar.foo.com, 145.37.93.126, A). Most standard calls for IPv4
+- If `Type==AAAA`, same idea of A record, but for IPv6
+- If `Type==NS`, then it points at authoritative DNS server that knows how to obtain the IP address for hosts in the domain
+- If `Type==CNAME`, then it implies requests for aliasing, mapping hosts and the canonical name (foo.com, relay1.bar.foo.com, CNAME) 
+- If `Type==MX`, then it's aliasing for emails. 
+
+Similar to how HTTP requests/responses are formatted, DNS requests and responses look like the following:
+
+
+<figure>
+<img src="./dns.png" alt="dns">
+<figcaption>DNS message format</figcaption>
+</figure>
+
+## 3.2 - DNS Records Insertion and Propagation <a name="dns_insert"></a>
+
+This is the final section of DNS. How is different types of DNS record inserted? There are thousands of accredited registrars all across the globe. Some of the more popular ones include GoDaddy, Namecheap, HostGator, and DreamHost. They would not only host your content in a server, they would also register DNS records for you. After verifying your domain name is unique, it will enter the domain name into the DNS database. 
+
+You also need to register primary (dns1.networkutopia.com, 212.2.212.1) and secondary authoritative DNS servers (dns2.networkutopia.com, 212.212.212.2). A primary DNS server is the first point of contact for a browser, application or device that needs to translate a human-readable hostname into an IP address. The primary DNS server contains a DNS record that has the correct IP address for the hostname. If the primary DNS server is unavailable, the device contacts a secondary DNS server, containing a recent copy of the same DNS records.
+
+So below is what will be registered.
+
+```bash
+(networkutopia.com, dns1.networkutopia.com, NS)
+(networkutopia.com, dns2.networkutopia.com, NS)
+(dns1.networkutopia.com, 212.212.212.1, A)
+(dns2.networkutopia.com, 212.212.212.2, A)
+```
+
+From the bottom, it will go to TLD, and to Root server. 
+
+**How does DNS propagation work?**
+
+Now the next question is, what happens if you want to keep the domain, but decide to switch the server location? The IP address will no longer remain the same. Because there is the Local DNS server caching mechanism, in order for the world to know this DNS change, it will take some time. The cache will expire based on TTL, and that is why it will take up to 72 hours for you to see the changes in the website.  
+
+That concludes the first part of networking!
