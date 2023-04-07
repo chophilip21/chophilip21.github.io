@@ -21,6 +21,8 @@ usemathjax: true
 - [DNS (Domain Name System)](#DNS)
 - [DNS Records and Messages](#dns_messages)
 - [DNS Records Insertion and Propagation](#dns_insert)
+- [Video streaming: TCP/UDP](#video)
+
 
 While studying the basics of networking in the [previous post](https://chophilip21.github.io/openssh_part2/), I realized that there are much more underlying contents related to it that I must know as a professional software engineer. At universities, it usually takes more than one semesters two fully cover all the essential topics related to networking, something that I missed as I did not study computer science for my undergraduate studies. I wanted to fill up this gap of knowledge, and my colleague recommended ["Computer Networking: A Top-Down Approach"](http://gaia.cs.umass.edu/kurose_ross/online_lectures.htm) by James F.Kurose and Keith W.Ross. I will be summarizing the core ideas that are relevant to me, and adding my thoughts to it in the next few blog posts.
 
@@ -173,7 +175,7 @@ But in most cases, non-persistent connections require greater CPU overhead, as t
 
 # 3.0 - DNS (Domain Name System) <a name="DNS"></a>
 
-Before setting up VPN according to [this SSH article](https://chophilip21.github.io/openssh_part3/), it's important to have a solid understanding of DNS. **Like how humans can be identified by their names, social security numbers, and even email addresses, Internet hosts can be identified by hostnames instead of IP addresses**, like google.com or facebook.com. 
+Before setting up VPN according to [this SSH article](https://chophilip21.github.io/openssh_part3/), it's important to have a solid understanding of DNS. DNS is also application layer protocol. **Like how humans can be identified by their names, social security numbers, and even email addresses, Internet hosts can be identified by hostnames instead of IP addresses**, like google.com or facebook.com. 
 DNS is nothing more than translating hostnames to IP addresses. 
 
 Apart from hostname translation, DNS can also do:
@@ -260,4 +262,32 @@ From the bottom, it will go to TLD, and to Root server.
 
 Now the next question is, what happens if you want to keep the domain, but decide to switch the server location? The IP address will no longer remain the same. Because there is the Local DNS server caching mechanism, in order for the world to know this DNS change, it will take some time. The cache will expire based on TTL, and that is why it will take up to 72 hours for you to see the changes in the website.  
 
-That concludes the first part of networking!
+# Playing videos in the internet <a name="video"></a>
+
+The final section of the article is understanding the videos. The very first company that I joined as a software engineer, was specialized in processing video footages with ML algorithms. While I was mostly in charge of ML part of the software, I did also work on designing video players too, but I never seriously considered how they work online exactly. If you think about it, video is an immense amount of data, which displays 20-30 images per second. How on earth is it possible to stream HD videos (4 Mbps) and even 4K videos (10 Mbps) so smoothly? 2Mbps video that plays for 60 minutes will consume gigabytes of storage and traffic. So how does services like Youtube and Netflix displaying their contents to end-users?
+
+
+<figure>
+<img src="https://www.cloudflare.com/img/learning/performance/what-is-streaming/what-is-streaming.svg" alt="video">
+<figcaption>Video Streaming</figcaption>
+</figure>
+
+To be able to stream videos, obviously the average internet throughput needs to be larger than the bit rate of the video. In the past, this was very difficult as our internet was much slower, so the video had to be either compressed to lower resolution in order to stream without stopping, or it had to be downloaded. 
+
+**TCP based videos**
+
+And there is nothing different in the way that streaming works compared to other data that's sent over the Internet. There is the video that lives in the server, and upon requests, audio and video data is broken down into data packets. In `HTTP Streaming`, the client establishes a TCP connection and the packets are sent over the network. When the packet reaches certain playable threshold, data will be decoded as buffered frames and played in an audio or video player (like Youtube) in the browser on the client device, while constantly requesting for the next portion of the data.  
+
+
+<figure>
+<img src="https://www.cloudflare.com/img/learning/performance/what-is-streaming/streaming-video-buffering.svg" alt="video">
+<figcaption>Buffering can be a problem when internet is slow</figcaption>
+</figure>
+
+Naturally, there can be circumstances where the data has not been encoded in time while playing the video, where the video stops playing to wait for the next frames to be decoded. This is the `buffering`. To minimize the delays, which gets larger when packets need to pass multiple links and servers to arrive to the clients, most companies use **Content Distribution Networ (CDN)** that stores the copies of the videos in multiple geographical locations, and connects the clients to the nearest locations (instead of pulling from main server all the time). Furthermore, caching is actively used to lower the buffering and network consumption as much as possible.   
+
+**UDP based videos**
+
+TCP connections make great sense for watching videos living in a server in a lossless fashion, but sometimes when you are watching live streams, speed and being live matters more than anything else. A few lost data packets do not matter that much, so UDP connection is used instead. Services like Youtube thus uses both UDP and TCP connections. 
+
+
