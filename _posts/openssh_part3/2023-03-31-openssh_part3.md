@@ -18,6 +18,7 @@ Okay, here comes the last post of the SSH series!
 - [VPN vs SSH](#vpn_vs_ssh)
 - [Raspberry Pi as VPN server](#raspberry_pi)
 - [Setting up OS on Raspberry Pi](#os)
+- [DHCP Reservation and Static Address](#dhcp)
 - [Pi Hole and DNS configuration](#pi_hole)
 # 1.0 - Dangers of Port Forwarding <a name="forwarding"></a>
 
@@ -90,10 +91,65 @@ $ ssh {userid}@{raspberry_pi_private_ip}
 
 Similar to any other IP dynamic addresses, the private IP on Raspberry PI will continue to change, thus **it will make your life easier by assigning static IP to Raspberry PI in the in the router**. Assign a static IP based on the subnet schema, save changes, and restart the router. 
 
-Okay so Raspberry PI is all set, so there is no more need to connect it to keyboard or monitor directly. Everything could be done via SSH terminal in the main Desktop. 
+Okay so Raspberry PI is all set, so there is no more need to connect it to keyboard or monitor directly. Everything could be done via SSH terminal in the main Desktop.
+
+## DHCP reservation and static address<a name="DHCP"></a>
+
+But before moving on to the next step, we need to set a **static IP for our Raspberry Pi and the main desktop**. This is because we will no longer be port-forwarding from public IPv4 address once the VPN is configured, and you would definitely need a static IP address for proper access. 
+
+When you run bash command:
+
+```bash
+$ ifconfig
+```
+
+You will see stuff like below. 
+
+```bash
+inet 192.xxx.x.xx  netmask 255.255.255.0  broadcast 192.xxx.x.xxx
+inet6 xx80::xx2e:xxx:fe45:764b  prefixlen 64  scopeid 0x20<link>
+inet6 xxxx:xxx:7b5e:6e00:xxxx:xxxx:xxxx:6cbc  prefixlen 64  scopeid 0x0<global>
+inet6 xxxx1:xxx:7b5e:6e00:xxxx:xxxx:xxxx:764b  prefixlen 64  scopeid 0x0<global>
+ether b4:xx:xx:xx:xx:xx txqueuelen 1000  (Ethernet)
+```
+
+From the router settings, you can choose to directly declare static IP for your device. Or, you can do `Dynamic Host Configuration Protocol(DHCP) Reservation`, in which your router provides a long list of reserved IP table, and you choose one that you would like to assign it to your device. You must know the `Media Access Control (MAC)` address of the device, which does not periodically change like IP address, as MAC address is a hardware identifier (you can force changes though). In my cases, MAC address was simply the one next to (Ethernet), which is `b4:xx:xx:xx:xx:xx`.
+
+There is no difference functionality wise, but because you are choosing from a list, you can ensure that you are not duplicating any IP assignment. So here, I went with DHCP reservation to get static IP. You need static IPs set up for PI hole set up.
+
 
 ## Pi Hole and DNS configuration <a name="pi_hole"></a>
 
-For the next few sections, I would recommend my blog post [here](https://chophilip21.github.io/network_part1/) to understand the basic concepts, especially those related to DNS. It's extra confusing to follow along if you don't understand the reasons behind each actions. 
+For the next few sections, I would recommend my blog post [here](https://chophilip21.github.io/network_part1/) to understand the basic concepts, especially those related to DNS. It's extra confusing to follow along if you don't understand the reasons behind each actions. Assuming you read it, let's talk about what PI hole achieves. 
 
 
+<figure>
+<img src="https://cdn.mos.cms.futurecdn.net/dbxpzhEmaZewKX7YEaexeY.png
+" alt="vpn/ssh">
+<figcaption>Pi hole allows you to block ads everywhere </figcaption>
+</figure>
+
+Pi-Hole is an advert-blocking application aimed at blocking ads at the network level. It acts as a Domain Name Service (DNS) server and, as such, queries all domains trying to access the devices connected to the network and blocks all ad-serving ones. You also block the unnecessary network requests for those ads and thus reduce bandwidth usage. **Pi-hole pairs nicely with a VPN (Virtual Private Network) so that you can connect remotely and still take advantage of ad-blocking from anywhere outside your network**. So we install Pi-hole just inside our Raspberry Pi, and we can protect the entire network, and monitor the statistics via the dashboard. 
+
+The installation instructions change time to time, so it's best to check out the [official page](https://github.com/pi-hole/pi-hole/#one-step-automated-install). Installation should be easy. 
+
+<figure>
+<img src="./upstream_provider.png" alt="vpn/ssh">
+<figcaption>You can set upstream provider to anything for now.</figcaption>
+</figure>
+
+
+Once download is complete, change your default password to something else:
+
+```bash
+$ pihole -a -p
+```
+
+you should be able to boot up web interface anytime via:
+
+```bash
+$ http://{static_ip}/admin
+$ http://pi.hole/admin  #or 
+```
+
+After logging into Pi-hole, we need to set **Pi-hole as DNS Server**.
