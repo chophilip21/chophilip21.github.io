@@ -2,16 +2,12 @@
 title: SSH Part3 - Using VPN to safely connect
 date: 2023-03-31 11:58:47 +07:00
 modified: 2023-03-31 16:49:47 +07:00
-tags: [VPN, pi-hole, wireguard, ssh, networking, raspberry pi]
+tags: [VPN, pi-hole, pivpn, wireguard, ssh, networking, raspberry pi]
 description: Making connections more secure using VPN
 image: "/openssh_part2/How-port-forwading-works-1.jpg"
 ---
 
 Okay, here comes the last post of the SSH series!
-
-<figure>
-<iframe src="https://giphy.com/embed/wXnmM6hHFtz3IulO36" width="480" height="270" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/thebachelorette-abc-the-bachelorette-bacheloretteabc-wXnmM6hHFtz3IulO36"></a></p>
-</figure>
 
 # Table of contents
 - [Dangers of Port Forwarding Layer](#forwarding)
@@ -19,7 +15,13 @@ Okay, here comes the last post of the SSH series!
 - [Raspberry Pi as VPN server](#raspberry_pi)
 - [Setting up OS on Raspberry Pi](#os)
 - [DHCP Reservation and Static Address](#dhcp)
+- [Setting up Public DNS Subdomain](#public_dns)
 - [Pi Hole and DNS configuration](#pi_hole)
+- [Unbound Recursive DNS servers](#unbound)
+- [Hooking up Unbound and Pi-hole together](#unbound+pi)
+- [PiVPN and WireGuard](#pivpn)
+- [Connecting WireGuard client](#wg-client)
+
 # 1.0 - Dangers of Port Forwarding <a name="forwarding"></a>
 
 In the [previous post](https://chophilip21.github.io/openssh_part2/), I have successfully created a SSH connection to my home Linux Server using port-forwarding and openSSH. But all appproaches have some weaknesses, and there are some vulnerabilities to port-forwarding as well. **Port forwarding inherently gives people outside of your network more access to your computer. Giving access or accessing unsafe ports can be risky, as threat actors and other people with malicious intents can then easily get full control of your device.** Yes the chance that someone might really care to attack my PC in this fashion is very small, and we are already protecting our entrance using SSH keys, but we cannot deny the fact that there is a more secure way -- `VPN`, which we have briefly discussed in the previous post.  
@@ -63,11 +65,15 @@ https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Raspberry_Pi_4_Model_B
 
 I initially purchased Raspberry PI during my graduate studies at SFU as a Summer project, but I never had a chance to make a good use out of it when I started my CO-OP term, followed by getting a full-time position offering at the end of the contract. Eventually I lost the motivation to do anything with it, but I figured now is a good time to do something useful at last.   
 
+I have referred to this [Github repo](https://github.com/notasausage/pi-hole-unbound-wireguard) and [Post from CrossWalk Solutions](https://www.crosstalksolutions.com/pivpn-wireguard-complete-setup-2022/) for a lot of the contents. So tribute to them. Setting up VPN looks quite trivial at first, but many sources offer different approaches and it can get quite tricky when things start to get mixed up. It actually took me weeks to get it right. But to give you overview, following will be used:
+
+- Pi-hole
+- Pi-vpn 
+- Wireguard
+
 # 2.1 - Setting up OS on Raspberry Pi <a name="os"></a>
 
-I have referred to this [Github repo](https://github.com/notasausage/pi-hole-unbound-wireguard) for a lot of the contents. 
-
-Setting up Raspberry PI OS is of course the first thing that needs to be done. Get a Micro SD card that is at least 16 GB or larger, and install OS from the official [installer here](https://www.raspbian.org/). If you would like to download any other OS, that is possible too, but my Raspberri Pi only has 2GB of RAM thus I did not want to install OS that may have higher RAM consumption. Just ensure you can connect your keyboard and monitor to Raspberry during installation, so that you can set up your user account initially. 
+Setting up Raspberry PI OS is of course the first thing that must be done. Get a Micro SD card that is at least 16 GB or larger, and install OS from the official [installer here](https://www.raspbian.org/). If you would like to download any other OS, that is possible too, but my Raspberri Pi only has 2GB of RAM thus I did not want to install OS that may have higher RAM consumption. Just ensure you can connect your keyboard and monitor to Raspberry during installation, so that you can set up your user account initially. 
 
 <figure>
 <img src="
@@ -89,11 +95,7 @@ Now you should be able to SSH into Raspberry Pi simply with
 $ ssh {userid}@{raspberry_pi_private_ip}
 ```
 
-Similar to any other IP dynamic addresses, the private IP on Raspberry PI will continue to change, thus **it will make your life easier by assigning static IP to Raspberry PI in the in the router**. Assign a static IP based on the subnet schema, save changes, and restart the router. 
-
-Okay so Raspberry PI is all set, so there is no more need to connect it to keyboard or monitor directly. Everything could be done via SSH terminal in the main Desktop.
-
-## DHCP reservation and static address<a name="DHCP"></a>
+## 2.2 - DHCP reservation and static address<a name="DHCP"></a>
 
 But before moving on to the next step, we need to set a **static IP for our Raspberry Pi and the main desktop**. This is because we will no longer be port-forwarding from public IPv4 address once the VPN is configured, and you would definitely need a static IP address for proper access. 
 
@@ -117,11 +119,49 @@ From the router settings, you can choose to directly declare static IP for your 
 
 There is no difference functionality wise, but because you are choosing from a list, you can ensure that you are not duplicating any IP assignment. So here, I went with DHCP reservation to get static IP. You need static IPs set up for PI hole set up.
 
+## 2.3 - Setting up Public DNS Subdomain <a name="public_dns"></a>
 
-## Pi Hole and DNS configuration <a name="pi_hole"></a>
+This is another very important step that's best to be configured first. In the later steps when we set up PiVPN, it will ask for either:
+
+1. Static Public IP address of your router
+2. DNS Entry with Public DNS Services
+
+It doesn't matter which approach you use, but I was not inclined to go for option number 1, mainly because if I were to set up public IP address, I would not even bother going through the trouble of setting up VPN because I can just go with port-forwarding on static IP address, just as how I did on the previous blog post. 
+
+But downside of having dynamic IP, as the name suggests, is that IP will keep on changing and you will not be able to establish proper connections. But there are a few free services like [FreeDNS Clients](https://freedns.afraid.org/faq/), that will allow you to set up DNS Entry on arbitrary domain, that will always look for the latest update to my router's IP address. 
+
+After creating and verifying account on FreeDNS, add subdomain with A record, and map it to your routers' IP address at the moment. 
+
+<figure>
+<img src="https://github.com/notasausage/pi-hole-unbound-wireguard/raw/master/screenshots/freedns-add-subdomain.png
+" alt="vpn/ssh">
+<figcaption>Some services charge money, or force you to login in every 30 days. FreeDNS is completely free from these (they do provide upgrade options too).</figcaption>
+</figure>
+
+Hit save, and you are done with part 1. Now there is part 2, which is **setting up CronJob that updates DNS variables on Raspberry Pi**.
+
+Go yo dyamic DNS page and copy Direct URL link at the bottom. 
+
+<figure>
+<img src="https://github.com/notasausage/pi-hole-unbound-wireguard/raw/master/screenshots/freedns-dynamic-dns.png
+" alt="vpn/ssh">
+<figcaption>This url needs to go into cronjob command.</figcaption>
+</figure>
+
+With below command, every 5 minutes cronjob will automatically look for changes in IP address. You can change it to something else. 
+
+```bash
+$ crontab -e
+$ */5 * * * * curl https://freedns.afraid.org/dynamic/update.php?XXXXX
+$ sudo service cron restart
+$ crontab -l #this must return valid values! 
+```
+
+## 2.4 - Pi Hole and DNS configuration <a name="pi_hole"></a>
+
+Okay, now we are ready to set up Pi-hole on our Raspberry Pi.
 
 For the next few sections, I would recommend my blog post [here](https://chophilip21.github.io/network_part1/) to understand the basic concepts, especially those related to DNS. It's extra confusing to follow along if you don't understand the reasons behind each actions. Assuming you read it, let's talk about what PI hole achieves. 
-
 
 <figure>
 <img src="https://cdn.mos.cms.futurecdn.net/dbxpzhEmaZewKX7YEaexeY.png
@@ -135,7 +175,7 @@ The installation instructions change time to time, so it's best to check out the
 
 <figure>
 <img src="./upstream_provider.png" alt="vpn/ssh">
-<figcaption>You can set upstream provider to anything for now.</figcaption>
+<figcaption>You can set upstream provider to anything for now. This will change later on.</figcaption>
 </figure>
 
 
@@ -152,4 +192,150 @@ $ http://{static_ip}/admin
 $ http://pi.hole/admin  #or 
 ```
 
-After logging into Pi-hole, we need to set **Pi-hole as DNS Server**.
+
+## 2.5 - Unbound Recursive Server <a name="unbound"></a>
+
+Remember that we randomly set-up upstream provider when installing Pi-hole? Now we need to fix this with `Unbound`.
+
+<figure>
+<img src="https://wp-cdn.pi-hole.net/wp-content/uploads/2018/05/pihole-ftldns-unbound-1024x682.png" alt="vpn/ssh">
+<figcaption>Unbound pairs up nicely with Pi-hole</figcaption>
+</figure>
+
+
+Whoa, at this point I was honestly a bit overwhelmbed, thinking <i>"This is much harder than I thought"</i>. Many tutorials suddenly started talking about `Unbound` while installing Pihole, which caused some extra confusion. But I had already came too far with this, so I needed to calm down and spend some time to read about the [relationship b/w Pihole and Unbound](https://docs.pi-hole.net/guides/dns/unbound/).
+
+Okay, we already know that Pi-hole is a sink hole for Ads, so that when we make requests, all the queries that may be used to throw ads back at us or cause any other trouble, go straight to the sink hole. When users make requests our **requests by default are forwarded to Upstream DNS servers (Google.com, etc), where there can be privacy concerns**. For example, when these DNS servers get hacked, we might have requested site A, but we might instead be forwarded to some phishing site B (millions of people using this DNS server will be affected).  
+
+So we have **tiny, self-hosted DNS servers like Unbound**, which does:
+1. When client asks for site A, Pi-hole checks cache first, and return result if not in block list. 
+2. If not in block list or cache, it goes to Unbound Recursive DNS resolver instead of Upstream DNS servers.
+3. Unbound query hits the root server > TLD > Authoritative Server
+4. Authoritative Server will finally give you all the IP information. 
+5. Pi-hole saves the answer to the cache. 
+
+Awesome, now that makes perfect sense! To install, 
+
+```bash
+$ sudo apt install unbound -y
+```
+
+Now we need to generate config file for unbound, which can be found [here](https://docs.pi-hole.net/guides/dns/unbound/)
+
+```bash
+$ sudo nano -w /etc/unbound/unbound.conf.d/pi-hole.conf
+```
+
+Make sure you are keeping ports consistent, (something like 53, or 5353). Unbound must be configured to refuse connections besides your local traffic, so:
+
+```bash
+$ # IPs authorized to access the DNS Server
+access-control: 0.0.0.0/0 refuse
+access-control: 127.0.0.1 allow
+access-control: 192.168.x.0/24 allow
+
+# Create DNS record for Pi-hole Web Interface
+private-domain: "pi.hole"
+local-zone: "pi.hole" static
+local-data: "pi.hole IN A 192.168.x.x"
+```
+
+access control here is based on `Classless Inter-Domain Routing (CIDR)` notation. If you are unsure how the range works, read this [article](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing). After replacing 192.168.x.x with your Raspberry Pi static IP, do:
+
+```bash
+$ sudo service unbound start
+$ dig pi-hole.net @127.0.0.1 -p 5353 #for testing
+$ sudo service unbound status # check status this way too
+```
+If dig returns some values, you are all set. 
+
+
+## 2.5 - Hooking up Unbound and Pi-hole together <a name="unbound+pi"></a>
+
+Okay Unbound is good to go, but it's meaningless unless it's connected to Pi-hile properly.  
+
+After logging back into Pi-hole admin page, we need to congire DNS Server settings. For more detailed tutorial on setting up [Pi-hole configuration](https://www.crosstalksolutions.com/the-worlds-greatest-pi-hole-and-unbound-tutorial-2023/) refer to the link. **Go to Settings > DNS** and uncheck any 3rd party Upstream DNS servers. 
+
+Now you will see this in the interface settings.The Upgstream DNS servers will be identical to Unbound configuration, so `127.0.0.1#5353`
+
+<figure>
+<img src="./dns_pihole.png" alt="vpn/ssh">
+<figcaption>There many ways to configure DNS settings, but do I you really need to go for potentially dangerous options?</figcaption>
+</figure>
+
+But what will be a bit confusing is the `Inteface Settings`. Many tutorials suggested going for "potentially dangerous options", even going for listen on all interfaces, permit all origins. I did not fully understand the rationale behind it (as none of the posts really explained why), as if you are on VPN, you will be considered as local traffic and thus you will be automatically covered. So I decided to keep it as it is instead of trying to go for options that frankly sounds quite intimidating. 
+
+# 3.0 - PiVPN and WireGuard <a name="pivpn"></a>
+
+And we are finally at the last stage, setting up [PiVPN Installer](https://pivpn.io/), which is the easiest way to set up VPN as far as I know. It acts as a glue b/w Pi-hole and [WireGuard VPN](https://www.wireguard.com/).
+
+First of all, what is `WireGuard`? WireGuard is an extremely simple yet fast and modern VPN that utilizes state-of-the-art cryptography. It aims to be faster, simpler, leaner, and more useful than IPsec, while avoiding the massive headache. It intends to be considerably more performant than the traditional self-hosted applications like OpenVPN. This is especially useful for Raspberry Pi, in which applications need to be as light and efficient as possible.  
+
+
+<figure>
+<img src="https://i0.wp.com/gadgetbond.com/wp-content/uploads/2021/09/wireguard-vpn-speed_IPV-blog.jpeg?resize=823%2C803&ssl=1" alt="vpn/ssh">
+<figcaption>Wireguard is current state of the art.</figcaption>
+</figure>
+
+**UDP Port Forwarding**
+
+For both WireGuard and OpenVPN, it's quite painful to install it from scratch, but if you use PiVPN installer, things get much simple. <i>It also knows that you already have PI-hole set up, so it will add things into the configurations.</i> But note that WireGuard needs UDP port forwarding on the router. Make sure you forward port 51820 to Raspberry PI.
+
+```bash
+Description: WireGuard VPN
+Public UDP Ports: 51820
+Private IP Address: 192.168.x.x
+Private UDP Ports: 51820
+```
+
+Now to install PiVPN:
+
+```bash
+$ curl -L https://install.pivpn.io | bash
+```
+
+If you set up static IP for Raspberry PI, UDP port-forwarding, and Pi Hole/Unbound configured, everything should make perfect sense until you get to **Public IP or DNS** section.
+
+<figure>
+<img src="https://hndrk.blog/content/images/2022/06/17.jpg" alt="vpn/ssh">
+<figcaption>Nothing to worry. Recall how we set up DNS Entry using Public DNS service</figcaption>
+</figure>
+
+Choose DNS Entry, and enter the subdomain we have created using `FreeDNS` earlier on. Once the installation is complete (you will be asked to reboot), we need to create a **VPN profile for every client we have**.
+
+```bash 
+pivpn -a
+```
+
+This will generate credential file, which should reside in the client machine (Mobile version would use QR code instead).
+
+
+## 3.1 - Connecting WireGuard client <a name="wg-client"></a>
+
+Funny thing about many tutorials out there on the internet, is that they do not mention how to connect to the VPN server from the client side. Perhaps this last step is too obvious for some, but it is what makes the entire setup meaningful. Without knowing how to connect, everything we have done up to this point will be wasted. You need to download [Wireguard Client](https://www.wireguard.com/install/), in which case I donwloaded the Windows Version for my laptop client. 
+
+<figure>
+<img src="https://lh5.googleusercontent.com/-tGILAG9jlVoQ7snmVlvEW63wSsHkVEb7_uhacxeXuF6JW9GiqYuh4CdJ1pNIHG_mLW0n09p5aNEFdNCSpnLPJFnVMWZIUy4c8ZC2eb0-TCTnCVpYSc9YnBhlS7R65q69uLiOFch" alt="vpn/ssh">
+<figcaption>Boot up the app, and load the config file</figcaption>
+</figure>
+
+With the config file we got from the server, activating should be dead easy. **BUT you may experience errors, where you can connect VPN, but cannot access the internet**. Honestly I was freaking out from the error, but I have discovered extremely convenient trick for PiVPN. Kudos to PiVPN team. 
+
+<figure>
+<img src="./pivpn-d.png" alt="vpn/ssh">
+<figcaption>Boot up the app, and load the config file</figcaption>
+</figure>
+
+If you run `pivpn -d`, PiVPN will show what may be missing from your current setup, and will automatically run fixes. Run this couple times to ensure that no error messages are seen. Now try connecting again.  
+
+<figure>
+<img src="https://lh6.googleusercontent.com/Ih7cSenwnodb0onU3GkYlh2mAgfRA0otpKU_YxoElZitbxXEZ3dSrXxqqZ33HrlEWey4vemC_i9-vDIjsIyXmFKnUdPcgWBtciynI9He4Q3FDssxfwP5UPLjwYI30ZbXIraMv5C_" alt="vpn/ssh">
+<figcaption>Check your Public IP (from another network) to make sure your VPN is working as it should.</figcaption>
+</figure>
+
+
+And that is it! I had never expected VPN set up to be this difficult, but I learned so much in the entire process and it was worth all the effort. 
+
+<figure>
+<iframe src="https://giphy.com/embed/wXnmM6hHFtz3IulO36" width="480" height="270" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/thebachelorette-abc-the-bachelorette-bacheloretteabc-wXnmM6hHFtz3IulO36"></a></p>
+</figure>
