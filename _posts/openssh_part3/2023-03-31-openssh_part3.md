@@ -169,6 +169,8 @@ For the next few sections, I would recommend my blog post [here](https://chophil
 <figcaption>Pi hole allows you to block ads everywhere </figcaption>
 </figure>
 
+You must understand Pi-Hole is different from PiVPN or WireGuard that will be discussed in later sections. It's not a VPN.
+
 Pi-Hole is an advert-blocking application aimed at blocking ads at the network level. It acts as a Domain Name Service (DNS) server and, as such, queries all domains trying to access the devices connected to the network and blocks all ad-serving ones. You also block the unnecessary network requests for those ads and thus reduce bandwidth usage. **Pi-hole pairs nicely with a VPN (Virtual Private Network) so that you can connect remotely and still take advantage of ad-blocking from anywhere outside your network**. So we install Pi-hole just inside our Raspberry Pi, and we can protect the entire network, and monitor the statistics via the dashboard. 
 
 The installation instructions change time to time, so it's best to check out the [official page](https://github.com/pi-hole/pi-hole/#one-step-automated-install). Installation should be easy. 
@@ -263,7 +265,7 @@ Now you will see this in the interface settings.The Upgstream DNS servers will b
 <figcaption>There many ways to configure DNS settings, but do I you really need to go for potentially dangerous options?</figcaption>
 </figure>
 
-But what will be a bit confusing is the `Inteface Settings`. Many tutorials suggested going for "potentially dangerous options", even going for listen on all interfaces, permit all origins. I did not fully understand the rationale behind it (as none of the posts really explained why), as if you are on VPN, you will be considered as local traffic and thus you will be automatically covered. So I decided to keep it as it is instead of trying to go for options that frankly sounds quite intimidating. 
+But what will be a bit confusing is the `Inteface Settings`. Many tutorials suggested going for "potentially dangerous options", like permitting all origins, or establishing custom rules. I did not fully understand the rationale behind it (as none of the posts really explained why), as if you are on VPN, you will be considered as local traffic and thus you will be automatically covered. So I decided to keep it as it is instead of trying to go for options that frankly sounds quite intimidating. 
 
 # 3.0 - PiVPN and WireGuard <a name="pivpn"></a>
 
@@ -323,7 +325,7 @@ With the config file we got from the server, activating should be dead easy. **B
 
 <figure>
 <img src="./pivpn-d.png" alt="vpn/ssh">
-<figcaption>Boot up the app, and load the config file</figcaption>
+<figcaption>PiVPN saves your life by fixing things up for you.</figcaption>
 </figure>
 
 If you run `pivpn -d`, PiVPN will show what may be missing from your current setup, and will automatically run fixes. Run this couple times to ensure that no error messages are seen. Now try connecting again.  
