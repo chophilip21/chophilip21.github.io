@@ -68,7 +68,7 @@ Applications on either server or client is referred to as `processes`, and each 
 </figure>
 
 
-Each transport protocol has its own pros and cons. For example, there is `Transmission control protocol (TCP)` and `User datagram protocol (UDP)`. For sensitive data that cares more about data loss, TCP protocol will be used. For interactive experience, UDP protocol will be typically used.  
+Each transport protocol has its own pros and cons. For example, there is `Transmission control protocol (TCP)` and `User datagram protocol (UDP)`. For sensitive data that cares more about data loss, TCP protocol will be used. For interactive experience, UDP protocol will be typically used. The two protocols are often called UDP/IP or TCP/IP since they run on top of IP.
 
 
 <figure>
@@ -77,6 +77,8 @@ Each transport protocol has its own pros and cons. For example, there is `Transm
 </figure>
 
 ## 1.4 - TCP Services (Transport layer protocol) <a name="TCP"></a>
+
+There are only two types of protocol in the Transport layer: **TCP and UDP**, and let's start with TCP. 
 
 TCP service model includes a connection-oriented service and a reliable data transfer service. This is where the famous 3-way handshake comes in. TCP has the client and server exchange transport layer control information with each other before the application-level messages begin to flow. This is like building a concrete bridge of connection before exchanging any information.
 
@@ -92,6 +94,14 @@ Because we have a TCP connection b/w server and host, we can have reliable strea
 ## 1.5 - UDP Services (Transport layer protocol) <a name="UDP"></a>
 
 UDP, on the other hand, is a lightweight transport protocol, which does not require any handshake or connections established before processes exchange information. Thus UDP does not guarantee that message will safely reach the other end, but it can pump data over to the other side in any rate it pleases, making it ideal for cases like live-streaming where being live matters more than anything else. 
+
+
+<figure>
+<img src="https://www.atatus.com/blog/content/images/2022/07/udp-vs-tcp--1-.png
+" alt="UDP">
+<figcaption>TCP requires lost data to be resent, but not UDP</figcaption>
+</figure>
+
 
 # 2.0 - HTTP (Application Layer Protocol) <a name="HTTP"></a>
 
@@ -174,6 +184,8 @@ But in most cases, non-persistent connections require greater CPU overhead, as t
 
 
 # 3.0 - DNS (Domain Name System) <a name="DNS"></a>
+
+The is another top application layer protocol.
 
 Before setting up VPN according to [this SSH article](https://chophilip21.github.io/openssh_part3/), it's important to have a solid understanding of DNS. DNS is also application layer protocol. **Like how humans can be identified by their names, social security numbers, and even email addresses, Internet hosts can be identified by hostnames instead of IP addresses**, like google.com or facebook.com. 
 DNS is nothing more than translating hostnames to IP addresses. 

@@ -314,18 +314,18 @@ This will generate credential file, which should reside in the client machine (M
 
 ## 3.1 - Connecting WireGuard client <a name="wg-client"></a>
 
-Funny thing about many tutorials out there on the internet, is that they do not mention how to connect to the VPN server from the client side. Perhaps this last step is too obvious for some, but it is what makes the entire setup meaningful. Without knowing how to connect, everything we have done up to this point will be wasted. You need to download [Wireguard Client](https://www.wireguard.com/install/), in which case I donwloaded the Windows Version for my laptop client. 
+Funny thing about many tutorials out there on the internet, is that they do not mention how to connect to the VPN server from the client side. Perhaps this last step is too obvious for some, but it is what makes the entire setup meaningful. Without knowing how to connect, everything we have done up to this point will be wasted. You need to download [Wireguard Client](https://www.wireguard.com/install/), in which case I downloaded the Windows Version for my laptop client. 
 
 <figure>
 <img src="https://lh5.googleusercontent.com/-tGILAG9jlVoQ7snmVlvEW63wSsHkVEb7_uhacxeXuF6JW9GiqYuh4CdJ1pNIHG_mLW0n09p5aNEFdNCSpnLPJFnVMWZIUy4c8ZC2eb0-TCTnCVpYSc9YnBhlS7R65q69uLiOFch" alt="vpn/ssh">
-<figcaption>Boot up the app, and load the config file</figcaption>
+<figcaption>Boot up the app, and load the config file to create VPN tunnel</figcaption>
 </figure>
 
-With the config file we got from the server, activating should be dead easy. **BUT you may experience errors, where you can connect VPN, but cannot access the internet**. Honestly I was freaking out from the error, but I have discovered extremely convenient trick for PiVPN. Kudos to PiVPN team. 
+With the config file we got from the server, activating should be dead easy. **BUT you may experience errors, where you can connect VPN, but cannot access the internet**. Do not worry, there is an easy way to automatically fix this via PiVPN. Kudos to their team. 
 
 <figure>
 <img src="./pivpn-d.png" alt="vpn/ssh">
-<figcaption>PiVPN saves your life by fixing things up for you.</figcaption>
+<figcaption>PiVPN saves your life by fixing things up for you while running debugging command.</figcaption>
 </figure>
 
 If you run `pivpn -d`, PiVPN will show what may be missing from your current setup, and will automatically run fixes. Run this couple times to ensure that no error messages are seen. Now try connecting again.  
