@@ -11,8 +11,9 @@ usemathjax: true
 # Table of contents
 - [REST (Representational State Transfer) API](#rest)
 - [Websockets vs HTTP (Do not compare to REST)](#rest_vs_socket)
+- [Grpc vs http](#grpc)
 - [Socket Programming](#socket)
-- [UDP Socket Python Programmin](#socket_udp)
+- [Transport Layer](#transport)
 
 In the [previous post](https://chophilip21.github.io/network_part1/), I have covered the basics of Networking, mostly around the top application layers of the OSI model. In this post, I will cover the lower layers of the OSI model: Session, Transport, and Network.  
 
@@ -61,6 +62,12 @@ HTTPs and Websockets are the communication protocols that have a defined set of 
 2. Huge difference, websockets are over persistent TCP cooniction, whereas HTTP/2.0 requests are not necessarily persistent. But they are both over TCP connection.
 3. **Websockets and Sockets are completely different concepts.**
 
+## 1.2 - gRPC vs HTTP <a name="grpc"></a>
+
+The term [gRPC](https://grpc.io/docs/languages/python/basics/) comes in many locations, and we also need to know where this belongs in the big picture. But before understanding what gRPC is, we need to understand `Remote Procedure Call (RPC)`.
+
+The idea of RPC, is invoking a function on a remote server. Restf
+
 
 # 2.0 - Socket programming <a name="socket"></a>
 
@@ -77,6 +84,17 @@ Okay now we know where everything belongs in the OSI model, let's return to the 
 2. The unique identifier of each socket is the **port number**. 
 3. When packets are generated, each packet will contain destination IP and port number, as well as source IP and port number. 
  
-## 2.1 - UDP Socket Python Programming <a name="socket_udp"></a>
+<figure>
+<img src="
+https://qph.cf2.quoracdn.net/main-qimg-08868215079c2d3cd56fc659ddbdf9e5" alt="osi">
+<figcaption>TCP example of socket programming</figcaption>
+</figure>
 
-Now we know the basic of socket programming, let's write some codes in Python, starting with UDP sockets. 
+
+Honestly there isn't anything that's too difficult to understand here. Let's move on to transport layer. 
+
+# 3.0 - Transport layer <a name="transport"></a>
+
+I have already covered the basics of transport layer in the previous post, but now let's go into deeper details, check how transport layer works with the network layer.
+
+https://nordicapis.com/whats-the-difference-between-rpc-and-rest/
