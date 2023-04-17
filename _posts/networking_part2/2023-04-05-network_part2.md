@@ -12,29 +12,35 @@ usemathjax: true
 - [REST (protocol vs architecture)](#rest)
 - [What is RPC?](#rpc)
 - [What is gRPC?](#grpc)
-- [Websockets (protocol, not architecture](#rest_vs_socket)
-- [Socket Programming](#socket)
-- [Transport Layer](#transport)
+- [What are Websockets?](#rest_vs_socket)
+- [Layer 6: Presentation layer](#presentation)
+- [Layer 5: Socket programming (Session layer)](#socket)
+- [Layer 4: Transport Layer)](#transport)
+- [Layer 4: Multiplexing and Demultiplexing](#plexing)
+- [Layer 4: Closer look at UDP](#udp)
 
-In the [previous post](https://chophilip21.github.io/network_part1/), I have covered the basics of Networking, mostly around the top application layers of the OSI model. In this post, I will cover the lower layers of the OSI model: Session, Transport, and Network.  
+
+In the [previous post](https://chophilip21.github.io/network_part1/), I have covered the basics of Networking, mostly around the top application layers of the OSI model. In this post, I will cover the lower layers of the OSI model. But before diving, don't forget that OSI models are in both directions:
 
 <figure>
 <img src="
-https://lh3.googleusercontent.com/Mn5UKGeWOhDRwTr16RCTN6MDfy1_u3bhzWJxa-jYgJd_xRvalV5IdKreSXWsI9ia_4Td89HApvz2XTsKWkyOstGbrJbcjOoJ3n6uHErwHQyRbOlraPiIa_BTDm-pTeQTD6UiGkty" alt="osi">
-<figcaption>Review of the OSI model. </figcaption>
+https://www.researchgate.net/publication/224631234/figure/fig1/AS:669093657063425@1536535767015/ILLUSTRATION-OF-THE-SEVEN-LAYER-OSI-MODEL.ppm" alt="osi">
+<figcaption>OSI models can be interpreted in both directions, depending on who you are (sender vs receiver) </figcaption>
 </figure>
 
 # 1.0 - REST (protocol vs architecture) <a name="rest"></a>
 
-Before heading over to the lower layers, very important distrinction is to understand architecture vs protocols. **A communication protocol is a system of rules (contract) that allows two or more entities of a communications system to transmit information via any kind of variation of a physical quantity. An architecture is how to best organize these protocols to create an efficient application.** Now let's talk about REST API.  REST stands for <i>REpresentational State Transfer </i>. I wanted to discuss it here, as it is not mentioned in the book at all. Well of course, there is a reason for that. It's because <u>REST in an architecture style (concept, not a contract), so it does not belong to OSI model. You can say it's layer 8 talking to layer 7. In application development, the only protocol that really belongs to the OSI application layer is HTTP protocols </u>.  But, you can picture everything like this:
+After reading the texbook for couple hours, I realized that the textbook does not mention some of the common software engineering terms like REST, SOAP, Websocket, GraphQL, and etc. And obviously this isn't because the author simply forgot, but it's because there exists a difference b/w architecture and protocols. Before hitting any lower layers in networking model, let's review some of the concepts. 
 
-- REST (Architecture, layer 8.)
+**A communication protocol is a system of rules (contract) that allows two or more entities of a communications system to transmit information via any kind of variation of a physical quantity. An architecture is how to best organize these protocols to create an efficient application.** REST (REpresentational State Transfer) is an architecture style (concept, not a contract), so it does not technically belong to OSI model according to the author. You can say it's imaginary layer 8 talking to layer 7. In application development, the only protocol that really belongs to the OSI application layer is HTTP protocol. But, you can picture everything like this:
+
+- REST (Architecture, say layer 8.)
 - HTTP (protocol. Layer 7.)
-- SOAP (protocol that relies on others. Layer 7.5)
-- Websocket (protocol that relies on others. Layer 7.5)
-- gRPC (protocol that relies on others. Layer 7.5)
+- SOAP (protocol that relies on others. Something like Layer 7.5)
+- Websocket (protocol that relies on others. Something like Layer 7.5)
+- gRPC (protocol that relies on others. Something like Layer 7.5)
 
-Above isn't something that everyone would agree, but it makes things easier to understand in the context of OSI models. REST on the imaginary layer 8 doesn't care about the building materials per say, so it can be used with HTTP, FTP, or any other communication protocol. REST just happens to be very commonly used with HTTP. If you see a statements like [gRPC is 7 times faster than REST](https://blog.dreamfactory.com/grpc-vs-rest-how-does-grpc-compare-with-traditional-rest-apis/#:~:text=%E2%80%9CgRPC%20is%20roughly%207%20times,data%20for%20this%20specific%20payload.), this isn't the most accurate statement because REST is just a general style. 
+Above isn't something that everyone would agree, as some says it does belong on the application layer, and some even say it belongs in the socket layer. But above is what makes sense to be the most. REST on the imaginary layer 8 doesn't care about the building materials per say, so it can be used with HTTP, FTP, or any other communication protocol. REST just happens to be very commonly used with HTTP. If you see a statements like [gRPC is 7 times faster than REST](https://blog.dreamfactory.com/grpc-vs-rest-how-does-grpc-compare-with-traditional-rest-apis/#:~:text=%E2%80%9CgRPC%20is%20roughly%207%20times,data%20for%20this%20specific%20payload.), this isn't the most accurate statement because REST is just a general style. 
 
 <figure>
 <img src="
@@ -54,6 +60,8 @@ To review some of the main conceptual ideas of REST:
     - `Layered`: REST style allows you to use layered system where you deploy API on server A, store data on server B, and authenticate in server C. 
 - Standard RESTful API HTTP methods include POST, PUT, PATCH, GET, DELETE.
 - Client sends requests typically in JSON format, which gets interpreted as HTTP requests by server. Server returns HTTP response, and API returns the HTTP response back in common formats like JSON/XML/HTML. 
+
+<i>I will elaborate and create REST based applications on other blog posts, but not here. </i>
 
 ## 1.1 - RPC <a name="rpc"></a>
 
@@ -95,45 +103,60 @@ gRPC leverages the simple, lightweight communication principle of RPC, and inste
 | `Payload`                 | Protobuf                         |      JSON     |
 | `Browser Support`         | No                               |      Yes     |
 
-Parsing with Protocol Buffers is less CPU-intensive because data is represented in a binary format which minimizes the size of encoded messages. This means that message exchange happens faster, even in devices with a slower CPU like IoT or mobile devices. However, it's support for browsers are quite limited in many ways, and thus RESTful HTTP protocols are still being used in many areas despite the speed advantage of gRPC.  
+As you can see, gRPC extends HTTP/2 protocols. A major difference is the use of protobuf (protocol buffers). Parsing with Protocol Buffers is less CPU-intensive because data is represented in a binary format which minimizes the size of encoded messages. This means that message exchange happens faster, even in devices with a slower CPU like IoT or mobile devices. However, it's support for browsers are quite limited in many ways, and thus RESTful HTTP protocols are still being used in many areas despite the speed advantage of gRPC.  
 
 
-## 1.3 - Websockets (protocol, not architecture) <a name="rest_vs_socket"></a>
+## 1.3 - Websockets <a name="rest_vs_socket"></a>
 
-Unlike REST or RPC, websocket isn't an API type. It's a communication protocol in the application layer, just like HTTP protocols. Below is an important picture to keep in mind:
-
-Yes, initially, then they switch to the webSocket protocol. All webSocket connections start with an HTTP request with a header that requests an upgrade to the webSocket protocol. If the receiving server agrees, then the two sides switch protocols from HTTP to webSocket and from then on the connection uses the webSocket protocol.
+Similar to gRPC, websocket can be seen as part of the application layer, extending HTTP protocols. WebSockets is communication channel, typically run from browsers connecting to Application Server over a protocol similar to HTTP that runs over TCP/IP, which is why it's called **websocket**. Below is an important picture to keep in mind:
 
 <figure>
 <img src="
-https://www.baeldung.com/wp-content/uploads/2019/04/OCI-Model.jpg" alt="osi">
-<figcaption>Both HTTP and Websocket belongs to the top layer</figcaption>
+https://www.vaadata.com/blog/wp-content/uploads/2020/07/Schema-websockets-1.jpg" alt="osi">
+<figcaption>Websocket communicates over persistent TCP connection</figcaption>
 </figure>
 
-HTTPs and Websockets are the communication protocols that have a defined set of rules with which communication works. The major difference is the data transmission mode. **An HTTP starts sending data as responses only when a request is received, whereas Websockets send and receives data based on data availability**. This is why for cases like chat-apps, which requires bi-directional real time communication, websockets are preferred over http based communication. 
+1. All webSocket connections start with an HTTP request with a header that requests an upgrade to the webSocket protocol. If the receiving server agrees, then the two sides switch protocols from HTTP to webSocket and from then on the connection uses the webSocket protocol
+2. **An HTTP starts sending data as responses only when a request is received, whereas Websockets send and receives data based on data availability**. This is why for cases like chat-apps, which requires bi-directional real time communication, websockets are preferred over http based communication. 
+2. websockets are over persistent TCP CONNECTION, whereas HTTP/2.0 requests are not necessarily persistent. But they are both over TCP connection.
+3. It makes no sense to compare REST and Websockets, as that is not comparing apples to apples.
+4. **Websockets and Sockets are completely different concepts.**
 
-1. It makes no sense to compare REST and Websockets, as that is not comparing apples to apples. It should vs HTTP vs Websockets.
-2. Huge difference, websockets are over persistent TCP cooniction, whereas HTTP/2.0 requests are not necessarily persistent. But they are both over TCP connection.
-3. **Websockets and Sockets are completely different concepts.**
+
+# 2.0 - Layer 6: Presentation layer <a name="presentation"></a>
+
+Okay, now we have cleared all our confusion regarding REST, Websockets, and GRPC protocols, let's look at the lower layers. Layer 6 is presentation layer. This is a layer that the textbook does not even bother explaining (as the author regards this layer as part of application layer), but it's good to know that it exists. This is a layer that translates the data for the application layer. 
+
+<figure>
+<img src="
+https://assets.website-files.com/5ff66329429d880392f6cba2/63cfb3d78ead0dcfdc5845c3_The%20presentation%20layer.png
+" alt="presentation layer">
+<figcaption>Translation/Encrpytion and Compression are the main features of presentation layer</figcaption>
+</figure>
+
+Serialization of complex data structures into flat byte-strings (using mechanisms such as TLV or XML) can be thought of as the key functionality of the presentation layer. Encryption is typically done at this level too, although it can be done on the application, session, transport, or network layers, each having its own advantages and disadvantages. 
+And of course, the communication flows up and down, so decryption is also handled at the presentation layer as well. Finally, presentation layer is also responsible for data compresion and decompression. 
 
 
-# 2.0 - Socket programming (protocol, not architecture) <a name="socket"></a>
 
-Okay, now we have cleared all our confusion regarding REST, Websockets, and GRPC protocols. 
+# 3.0 - Layer 5: Socket programming (Session layer) <a name="socket"></a>
 
-Before reading the book, I thought sockets and websockets refer to the same thing, as the names are quite similar. But they are completely different things. WebSockets is communication channel, typically run from browsers connecting to Application Server over a protocol similar to HTTP that runs over TCP/IP, which is why it's called **websocket**. However, **Socket is an endpoint for sending and receiving data across the network (like Port number), belonging to OSI model layer 5**. 
+Layer 5 is the session layer. Session Layer is the first one where pretty much all practical matters related to the addressing, packaging and delivery of data are left behind—they are functions of layers four and below. It is the lowest of the three upper layers, which collectively are concerned mainly with software application issues and not with the details of network and internet implementation. The name of this layer tells you much about what it is designed to do: to allow devices to establish and manage sessions. In general terms, a session is a persistent logical linking of two software application processes, to allow them to exchange data over a prolonged period of time. In some discussions, these sessions are called dialogs; they are roughly analogous to a telephone call made between two people.
+
+With in the layer 5, the book focuses the most on **sockets, which is an endpoint for sending and receiving data across the network (like Port number), belonging to OSI model layer 5**. 
 
 ```bash
 #example of socket (protocol, local address, local port, remote address, remote port)
 (TCP, 8.8.8.4, 8080, 8.8.8.8, 8070)
 ```
 
-Okay now we know where everything belongs in the OSI model, let's return to the book. If a process is a house, process's socket is analogous to a door. We have already done SSH/VPN set up multiple times, so this should be easy to understand. To summarize: 
+If a process is a house, process's socket is analogous to a door. To summarize: 
 
 1. We send messages to sockets, which sends data to down the transport layer (both UDP and TCP available).
 2. The unique identifier of each socket is the **port number**. 
 3. When packets are generated, each packet will contain destination IP and port number, as well as source IP and port number. 
  
+
 <figure>
 <img src="
 https://qph.cf2.quoracdn.net/main-qimg-08868215079c2d3cd56fc659ddbdf9e5" alt="osi">
@@ -141,10 +164,36 @@ https://qph.cf2.quoracdn.net/main-qimg-08868215079c2d3cd56fc659ddbdf9e5" alt="os
 </figure>
 
 
-Honestly there isn't anything that's too difficult to understand here. Let's move on to transport layer. 
+# 4.0 - Transport layer <a name="transport"></a>
 
-# 3.0 - Transport layer <a name="transport"></a>
+In the application layer, messages are generated with the HTTP protocols, hits the sockets in the session layer, waiting to be carried over the network over two transport layer protocol options --- TCP/IP and UDP/IP. This is where messages are chopped into smaller segments (TCP or UDP segments), packaged as IP packets, and delivered down through the pipeline. Apart from above, there are actually several other important procedures running behind the scenes to ensure the best outcome.   
 
-I have already covered the basics of transport layer in the previous post, but now let's go into deeper details, check how transport layer works with the network layer.
+<figure>
+<img src="
+https://www.baeldung.com/wp-content/uploads/sites/4/2021/07/1.jpg" alt="transport layer">
+<figcaption>There are many services running in the transport layer </figcaption>
+</figure>
 
-https://nordicapis.com/whats-the-difference-between-rpc-and-rest/
+
+## 3.1 - Layer 4: Multiplexing and Demultiplexing <a name="plexing"></a>
+
+An important function of transport layer, is not only to deliver a message, but it also needs to correctly deliver the message to the process requesting the message. Each process running in the application can have multiple sockets, doors used to exchange data. `Multiplexing` is the process running on the sender side, which aggregates data from each socket, and encapsulating with transport headers, passing to the network layer.   
+
+
+<figure>
+<img src="
+https://www.thestudygenius.com/wp-content/uploads/2021/11/Multiplexing-Demultiplexing-image-1-1024x357.png" alt="muxing">
+<figcaption>Multiplexing (server) and Demultiplexing (client) are opposites </figcaption>
+</figure>
+
+The client side operation equivalent to this is `demultiplexing`, reading the data, and sending the data to correct application layer processes waiting for the data. Each TCP/UDP segment has source port number field, and destination port number field (well known port numbers are restricted for safety), so that Multiplexing and Demultiplexing are done properly. 
+
+<figure>
+<img src="
+./tcp_segment.png" alt="muxing">
+<figcaption>Multiplexing (server) and Demultiplexing (client) are opposites </figcaption>
+</figure>
+
+Generally speaking, application developers do not have to worry about these, but it's great to know about theoretical aspects of it. 
+
+## 3.1 - Layer 4: Closer look at UDP <a name="udp"></a>
