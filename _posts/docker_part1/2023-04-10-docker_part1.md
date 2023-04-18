@@ -1,5 +1,5 @@
 ---
-title: Docker part 1
+title: Docker part 1 - Learn Docker in a Month of Lunches
 date: 2023-04-10 11:58:47 +07:00
 modified: 2023-04-11 16:49:47 +07:00
 tags: [docker]
@@ -16,7 +16,9 @@ usemathjax: true
 
 # 1.0 - Docker. How much do you know?  <a name="preface"></a>
 
-If you are software engineer with some experience, it's very likely that you would have had some exposures to [Docker](https://www.docker.com/). But if you think about it, distributed systems, and containers have pretty much taken over the world, and essentially every applications out there is containerized these days. Naturally, there are immense amount of contents associated with Docker beyond simple image build, pull, etc, and a lot of the sophisticated tools like [Kubernetes](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/), [Terraform](https://www.terraform.io/), [Ansible](https://www.ansible.com/), and etc operate on top of containers. My manager asked how much I know about Docker oneday, and to be honest I did not know how much I knew about it either. So that is why I decided to start reading a popular book called [Learn Docker in a Month of Lunches](https://github.com/sixeyed/diamol), and check how much I know about Docker, and fill up any gaps that might exist in my knowledge. 
+If you are software engineer with some experience, it's very likely that you would have had some exposures to [Docker](https://www.docker.com/). Distributed systems and containers have taken over the world, and essentially every applications out there is containerized these days. Naturally, there are immense amount of contents associated with Docker beyond simple image build, pull, etc, and a lot of the sophisticated tools like [Kubernetes](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/), [Terraform](https://www.terraform.io/), [Ansible](https://www.ansible.com/), and etc operate on top of containers. 
+
+For my work, I need to learn how to use Terraform with Dockers, but before I dive into Terraform, it would be great to check how much I know about Docker. So that is why I decided to start reading a popular book called [Learn Docker in a Month of Lunches](https://github.com/sixeyed/diamol), and check how much I know about Docker, and fill up any gaps that might exist in my knowledge. 
 
 <figure>
 <img src="
@@ -120,11 +122,14 @@ layer cache is used.
 7. App exposes port 80.
 8. ENTRYPOINT is alternative to CMD operation, executing compiled JAVA file. 
 
-Alright. I get everything that is happening. But you can't really learn just by following examples. You gotta make your own example.
 
 # 2.0 - Python Example <a name="python"></a>
 
-1. Python code that does center crop
+Alright. I get everything that is happening here, but I don't like simply following along the examples (also something that is not written in Python). 
+
+You learn from actually writing your own examples. So this is what I plan to do: 
+
+1. Container 1: Python Container code that does center crop. Saves it 
 2. Pass the original image and cropped image to the server container
 3. Server container displays the data
 

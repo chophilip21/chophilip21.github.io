@@ -1,5 +1,5 @@
 ---
-title: Networking part 2 - Session Layer and Transport Layer
+title: Networking part 2 - Lower Layers (What about API?)
 date: 2023-04-05 09:58:47 +07:00
 modified: 2023-04-06 16:49:47 +07:00
 tags: [networking, OSI]

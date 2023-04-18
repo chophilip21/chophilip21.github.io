@@ -14,3 +14,12 @@ $ cd jekyll-klise
 $ bundle install
 $ bundle exec jekyll serve
 ```
+
+## To run some of the codes 
+
+```
+python3 -m venv env
+source env/bin/activate
+pip install -r requirements.txt 
+# pip3 freeze > requirements.txt
+```
