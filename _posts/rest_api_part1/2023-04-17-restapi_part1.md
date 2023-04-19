@@ -9,49 +9,31 @@ usemathjax: true
 
 # Intro to REST API
 
-In the previous [post](https://chophilip21.github.io/network_part2/#rest), I have briefly touched upon REST APIs theories. My knowledge for building REST APIs are quite rusty, as the last time I coded any RESTful application was during my studies at SFU for a class project, which is years back. Surprisingly for my jobs I never really had to build one, so I definitely need to review it now as it doesn't make sense for a software developer to not know how to build one. For the framework, I have experience with `Flask` in the past, and it is more than sufficient for proof of concepts. There is no need to go for more sophisticated options like `Fast API` or `Django`, as I am not trying to build a full-stack application here.  
+In the previous [post](https://chophilip21.github.io/network_part2/#rest), I have briefly touched upon REST APIs theories. My knowledge for building REST APIs are quite rusty, as the last time I coded any RESTful application was during my studies at SFU for a class project, which is years back. Surprisingly for my jobs I never really had to build one, so I definitely need to review it now as it doesn't make sense for a software developer to not know how to build one. In terms of the backend framework, I have experience with `Flask` in the past, and it is more than sufficient for proof of concepts. But I always wanted to try learning how to use [Fast API](https://fastapi.tiangolo.com/tutorial/#install-fastapi), as I heard that it has much smoother learning curve than `Django`, and much faster speed as it is light-weighted. Plus I will be working on things that are much beyond proof of concepts, so I thought it would be great to tackle some new stuff. 
 
 
-## First example: Hello World
+## First FastAPI example: Hello World
 
-**We have learned about the basics of networking, and I now know that Flask listens on a TCP socket, and exchanges HTTP requests/response in the format of JSON, like any other RESTful frameworks do**. And setting up basic examples on Flask is dead easy, almost 0 learning curve. `Flask-RESTful` is just an extension for Flask that adds support for quickly building REST APIs. It is a lightweight abstraction that works with your existing ORM/libraries. Flask-RESTful encourages best practices with minimal setup. If you are familiar with Flask, Flask-RESTful should be easy to pick up. <i>This avoids having to set up index, route, and all that that is normally required for flask webapps</i>.
+Running FastAPI Hello World very easy.
 
-```py
-from flask import Flask
-from flask_restful import Resource, Api
+```py 
+from fastapi import FastAPI
 
-app = Flask(__name__)
+app = FastAPI()
 
-api = Api(app)
 
-class Helloworld(Resource):
+@app.get("/")
+async def root():
+    return {"message": "to be or not to be"}
 
-	def __init__(self):
-
-		pass
-
-	def get(self):
-
-		return {
-			"Hello": "World"
-		}
-
-api.add_resource(Helloworld, '/')
-
-if __name__ == '__main__':
-
-	app.run(debug=True)
+# uvicorn main:app --reload
+# http://127.0.0.1:8000/docs ---> Integrates well with the swagger dashboard. 
 ```
 
-Clients can get this response anytime via localhost url:
+And it integrates nicely with the [Swagger UI](https://swagger.io/tools/swagger-ui/) interactive session. 
 
-```py
-import requests
-url = "http://127.0.0.1:5000/"
-response = requests.get(url=url)
-print(response.text)
-```
+## Second example: Movies
 
-You should get the same JSON respose. 
+Now we are going to work with other methods in rest: `PUT`, `POST`, `DELETE`. The data structure gets managed with [Pydantic](https://docs.pydantic.dev/install/).
 
 

@@ -182,7 +182,7 @@ An important function of transport layer, is not only to deliver a message, but 
 
 <figure>
 <img src="
-https://www.thestudygenius.com/wp-content/uploads/2021/11/Multiplexing-Demultiplexing-image-1-1024x357.png" alt="muxing">
+https://www.cs.csustan.edu/~john/Classes/Previous_Semesters/CS3000_Communication_Networks/2018_02_Spring/Notes/CNAI_Figures/figure-11.1.jpeg" alt="muxing">
 <figcaption>Multiplexing (server) and Demultiplexing (client) are opposites </figcaption>
 </figure>
 
@@ -197,3 +197,7 @@ The client side operation equivalent to this is `demultiplexing`, reading the da
 Generally speaking, application developers do not have to worry about these, but it's great to know about theoretical aspects of it. 
 
 ## 3.1 - Layer 4: Closer look at UDP <a name="udp"></a>
+
+We already know that when using UDP, there is no additional procedures like doing handshakes (**This is why it's called connectionless**), so application almost directly talks with IP. Network layer encapsulates information from UDP to datagram, and using the destination port information, it will try it's best to deliver the messages to the correct location. Unlike TCP, there is no congestion control or retry mechanism to counter dataloss. But instead, UDP just blasts away at full speed to minimize any delay in retrival of data. 
+
+This is why DNS service use UDP whether than UDP, the very first thing that runs when loading browser
