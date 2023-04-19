@@ -71,6 +71,8 @@ I have referred to this [Github repo](https://github.com/notasausage/pi-hole-unb
 - Pi-vpn 
 - Wireguard
 
+Yes, VPN will introduce additional latency, but I am not trying to play a game remotely. Some latency below 100 ms does not effect the performance when coding. 
+
 # 2.1 - Setting up OS on Raspberry Pi <a name="os"></a>
 
 Setting up Raspberry PI OS is of course the first thing that must be done. Get a Micro SD card that is at least 16 GB or larger, and install OS from the official [installer here](https://www.raspbian.org/). If you would like to download any other OS, that is possible too, but my Raspberri Pi only has 2GB of RAM thus I did not want to install OS that may have higher RAM consumption. Just ensure you can connect your keyboard and monitor to Raspberry during installation, so that you can set up your user account initially. 

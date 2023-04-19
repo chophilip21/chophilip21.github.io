@@ -18,6 +18,7 @@ usemathjax: true
 - [Layer 4: Transport Layer)](#transport)
 - [Layer 4: Multiplexing and Demultiplexing](#plexing)
 - [Layer 4: Closer look at UDP](#udp)
+- [Layer 4: Closer look at TCP](#tcp)
 
 
 In the [previous post](https://chophilip21.github.io/network_part1/), I have covered the basics of Networking, mostly around the top application layers of the OSI model. In this post, I will cover the lower layers of the OSI model. But before diving, don't forget that OSI models are in both directions:
@@ -30,9 +31,7 @@ https://www.researchgate.net/publication/224631234/figure/fig1/AS:66909365706342
 
 # 1.0 - REST (protocol vs architecture) <a name="rest"></a>
 
-After reading the texbook for couple hours, I realized that the textbook does not mention some of the common software engineering terms like REST, SOAP, Websocket, GraphQL, and etc. And obviously this isn't because the author simply forgot, but it's because there exists a difference b/w architecture and protocols. Before hitting any lower layers in networking model, let's review some of the concepts. 
-
-**A communication protocol is a system of rules (contract) that allows two or more entities of a communications system to transmit information via any kind of variation of a physical quantity. An architecture is how to best organize these protocols to create an efficient application.** REST (REpresentational State Transfer) is an architecture style (concept, not a contract), so it does not technically belong to OSI model according to the author. You can say it's imaginary layer 8 talking to layer 7. In application development, the only protocol that really belongs to the OSI application layer is HTTP protocol. But, you can picture everything like this:
+After reading the texbook for couple hours, I realized that the textbook does not mention some of the common software engineering terms like REST, SOAP, Websocket, GraphQL, and etc. And obviously this isn't because the author is reckless, but it's because architectural style or frameworks don't technically belong in the definition of OSI model. OSI model explains concepts related to computer systems communicating over network. **A communication protocol is a system of rules (contract) that allows two or more entities of a communications system to transmit information via any kind of variation of a physical quantity. An architecture is how to best organize these protocols to create an efficient application.** REST (REpresentational State Transfer) is an architecture style (concept, not a contract), so it does not technically belong to OSI model according to the author. You can say it's imaginary layer 8 talking to layer 7. In application development, the only protocol that really belongs to the OSI application layer is HTTP protocol. But, you can picture everything like this:
 
 - REST (Architecture, say layer 8.)
 - HTTP (protocol. Layer 7.)
@@ -40,7 +39,7 @@ After reading the texbook for couple hours, I realized that the textbook does no
 - Websocket (protocol that relies on others. Something like Layer 7.5)
 - gRPC (protocol that relies on others. Something like Layer 7.5)
 
-Above isn't something that everyone would agree, as some says it does belong on the application layer, and some even say it belongs in the socket layer. But above is what makes sense to be the most. REST on the imaginary layer 8 doesn't care about the building materials per say, so it can be used with HTTP, FTP, or any other communication protocol. REST just happens to be very commonly used with HTTP. If you see a statements like [gRPC is 7 times faster than REST](https://blog.dreamfactory.com/grpc-vs-rest-how-does-grpc-compare-with-traditional-rest-apis/#:~:text=%E2%80%9CgRPC%20is%20roughly%207%20times,data%20for%20this%20specific%20payload.), this isn't the most accurate statement because REST is just a general style. 
+Above isn't something that everyone would agree, but above is what makes sense to be the most. REST on the imaginary layer 8 doesn't care about the building materials per say, so it can be used with HTTP, FTP, or any other communication protocol. REST just happens to be very commonly used with HTTP. If you see a statements like [gRPC is 7 times faster than REST](https://blog.dreamfactory.com/grpc-vs-rest-how-does-grpc-compare-with-traditional-rest-apis/#:~:text=%E2%80%9CgRPC%20is%20roughly%207%20times,data%20for%20this%20specific%20payload.), this isn't the most accurate statement because REST is just a general style. 
 
 <figure>
 <img src="
@@ -198,6 +197,30 @@ Generally speaking, application developers do not have to worry about these, but
 
 ## 3.1 - Layer 4: Closer look at UDP <a name="udp"></a>
 
-We already know that when using UDP, there is no additional procedures like doing handshakes (**This is why it's called connectionless**), so application almost directly talks with IP. Network layer encapsulates information from UDP to datagram, and using the destination port information, it will try it's best to deliver the messages to the correct location. Unlike TCP, there is no congestion control or retry mechanism to counter dataloss. But instead, UDP just blasts away at full speed to minimize any delay in retrival of data. 
+We already know that when using UDP, there is no additional procedures like doing handshakes (**This is why it's called connectionless**), so the application almost directly talks with IP. Network layer encapsulates information from UDP to datagram, and using the destination port information, it will try it's best to deliver the messages to the correct location. Unlike TCP, there is no congestion control or retry mechanism to counter dataloss. But instead, UDP just blasts away at full speed to minimize any delay in retrival of data. This is why DNS service use UDP whether than UDP, the very first thing that runs when loading browser, because the speed matters the most. 
 
-This is why DNS service use UDP whether than UDP, the very first thing that runs when loading browser
+There is minimum overhead for UDP segment structure. There are only four fields, each consisting two bytes:
+
+- Source/dest port number
+- length
+- Checksum
+
+<figure>
+<img src="
+./udp_segment.png" alt="segment">
+<figcaption>UDP has only 8 bytes of overhead, whereas TCP segment has 20 bytes of header overhead.</figcaption>
+</figure>
+
+Both TCP and UDP operate on **IP (network layer protocol), which is unreliable channel**. This is because IP protocol does not provide any functionality for error recovering for datagrams that are either duplicated, lost or arrive to the remote host in another order than they are send. This is why we take security measures in the upper layers. 
+
+UDP does have `checksum` to determine whether bites within UDP segment have been altered (e.g accidental noise inserted when passing network/router). But the problem is, although UDP does provide error checking mechanism, **it does not do anything to recover from an error**. Damaged segment is usually just ignored, or passed with a warning. 
+
+## 3.2 - Layer 4: Closer look at TCP <a name="tcp"></a>
+
+We looked at UDP, so of course we need to take a look at TCP as well. Recall TCP has these features: 
+
+**1. full-duplex service**: If there is a TCP connection between Process A on one host and Process B on another host, then application-layer data can flow from Process A to Process B at the same time as application-layer data flows from Process B to Process A.
+
+**2. point to point**: transfer is always between one sender and one receiver. one sender cannot send data to multiple receiver at once. There needs to be multiple connections in that case. 
+
+**3. Three way handshake**: 

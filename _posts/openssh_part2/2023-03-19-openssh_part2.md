@@ -103,7 +103,33 @@ There are multiple ways to tackle the SSH problems, and each methods have its ow
 
 Under normal circumstances, your network is configured to restrict the ability to access most of these ports from the outside internet. Exposing certain ports to the internet means exposing your network to hacking and all the nasty surprises that come along with it. Port Forwarding does its job, but you can't deny the fact that it has greater risks.
 
-And there is alternative, which is setting up `VPN`. It allows your **computer outside the network to behave as if it was inside the network**. This sets up additional layer of work, but this establihes additional layer of security and now you can **connect directly via private ip address without having to expose any ports on your router to internet**. You can use tools like [openvpn](https://openvpn.net/) to setup a VPN server, but cons of this approach would be increased complexity in the entire process. This will be discussed further in detail, [on the next post](https://chophilip21.github.io/openssh_part3/).
+And there is alternative, which is setting up `VPN`. It allows your **computer outside the network to behave as if it was inside the network**. This sets up additional layer of work, but this establihes additional layer of security and now you can **connect directly via private ip address without having to expose any ports on your router to internet**. You can use tools like [openvpn](https://openvpn.net/) to setup a VPN server, but cons of this approach would be: 
+
+- Increased complexity in the entire process. 
+- Increased **latency** by introducing extra travel time for requests and responses
+
+Let's review the differences b/w `latency`, `bandwidth`, and `throughput`. 
+
+Start with an easy one. **bandwidth vs throughput**.
+
+<figure>
+<img src="https://cdn.ttgtmedia.com/rms/onlineimages/network_bandwidth_vs_throughput-f.png" alt="segment">
+<figcaption>bandwidth vs throughput (speed)</figcaption>
+</figure>
+
+Bandwidth measurement units include bit, kilobit, megabit (Mb) and gigabit (Gb). If a network has a bandwidth of 1 Gbps, this means 1 Gb is the maximum amount of data that could travel between links in one second, in an ideal situation. But network connection isn't always ideal, and actual performance is usally lower. Throughput shows the data transfer rate and reflects how the network is actually performing. A network could have a bandwidth of 1 Gbps, but, depending on the circumstances, its throughput could be only 500 Mbps, with the network processing half its capacity.
+
+
+<figure>
+<img src="https://rocketcdn.me/wp-content/uploads/Network-latency-explained.png" alt="latency">
+<figcaption>Latency is often measured as round-trip time (ping & pong)</figcaption>
+</figure>
+
+
+**Latency (ping)** is a measurement of the amount of time it takes a data packet to travel from one point in the network to another, from sender to receiver. Most often, latency is measured between a user's device and a data center (server). Latency is caused by distance that signal needs to travel, and various reasons behind network architecture. <i>Obviously this measures how fast first bit reaches the other hand, so it bandwidth doesn't really affect the latency. But overall performance/experience of application will depend on both</i>.
+
+
+VPN will be discussed further in detail, [on the next post](https://chophilip21.github.io/openssh_part3/).
 
 
 # 3.0 - Ngrok, Tailscale
