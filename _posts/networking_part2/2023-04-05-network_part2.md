@@ -1,5 +1,5 @@
 ---
-title: Networking part 2 - Transport Layers (What about API?)
+title: Networking part 2 - Transport Layers
 date: 2023-04-05 09:58:47 +07:00
 modified: 2023-04-06 16:49:47 +07:00
 tags: [networking, OSI]
@@ -9,19 +9,16 @@ usemathjax: true
 ---
 
 # Table of contents
-- [REST (protocol vs architecture)](#rest)
-- [What is RPC?](#rpc)
-- [What is gRPC?](#grpc)
-- [What are Websockets?](#rest_vs_socket)
 - [Layer 6: Presentation layer](#presentation)
 - [Layer 5: Socket programming (Session layer)](#socket)
 - [Layer 4: Transport Layer)](#transport)
 - [Layer 4: Multiplexing and Demultiplexing](#plexing)
 - [Layer 4: Closer look at UDP](#udp)
 - [Layer 4: Closer look at TCP](#tcp)
+- [Layer 4: Flow/Congestion Management](#congestion)
 
 
-In the [previous post](https://chophilip21.github.io/network_part1/), I have covered the basics of Networking, mostly around the top application layers of the OSI model. In this post, I will cover the lower layers of the OSI model. But before diving, don't forget that OSI models are in both directions:
+In the [previous post](https://chophilip21.github.io/network_part1/), I have covered the basics of Networking, mostly around the top application layers of the OSI model. I will cover the lower layers of the OSI model in this post. But before diving, don't forget that OSI models are in both directions:
 
 <figure>
 <img src="
@@ -29,102 +26,10 @@ https://www.researchgate.net/publication/224631234/figure/fig1/AS:66909365706342
 <figcaption>OSI models can be interpreted in both directions, depending on who you are (sender vs receiver) </figcaption>
 </figure>
 
-# 1.0 - REST (protocol vs architecture) <a name="rest"></a>
 
-After reading the texbook for couple hours, I realized that the textbook does not mention some of the common software engineering terms like REST, SOAP, Websocket, GraphQL, and etc. And obviously this isn't because the author is reckless, but it's because architectural style or frameworks don't technically belong in the definition of OSI model. OSI model explains concepts related to computer systems communicating over network. **A communication protocol is a system of rules (contract) that allows two or more entities of a communications system to transmit information via any kind of variation of a physical quantity. An architecture is how to best organize these protocols to create an efficient application.** REST (REpresentational State Transfer) is an architecture style (concept, not a contract), so it does not technically belong to OSI model according to the author. You can say it's imaginary layer 8 talking to layer 7. In application development, the only protocol that really belongs to the OSI application layer is HTTP protocol. But, you can picture everything like this:
+# 1.0 - Layer 6: Presentation layer <a name="presentation"></a>
 
-- REST (Architecture, say layer 8.)
-- HTTP (protocol. Layer 7.)
-- SOAP (protocol that relies on others. Something like Layer 7.5)
-- Websocket (protocol that relies on others. Something like Layer 7.5)
-- gRPC (protocol that relies on others. Something like Layer 7.5)
-
-Above isn't something that everyone would agree, but above is what makes sense to be the most. REST on the imaginary layer 8 doesn't care about the building materials per say, so it can be used with HTTP, FTP, or any other communication protocol. REST just happens to be very commonly used with HTTP. If you see a statements like [gRPC is 7 times faster than REST](https://blog.dreamfactory.com/grpc-vs-rest-how-does-grpc-compare-with-traditional-rest-apis/#:~:text=%E2%80%9CgRPC%20is%20roughly%207%20times,data%20for%20this%20specific%20payload.), this isn't the most accurate statement because REST is just a general style. 
-
-<figure>
-<img src="
-https://restapilinks.com/wp-content/uploads/2021/03/ekawmj3rafdtn06hzj79.png
-" alt="osi">
-<figcaption>Conceptually, REST does not belong to OSI model. But could be seen as layer 8.</figcaption>
-</figure>
-
-
-To review some of the main conceptual ideas of REST:
-
-- REST is architectural style, and HTTP is protocol. It imposes conditions on how an API should work. 
-- REST API needs to ensure:
-    - `Statelessness`: Every requests are treated independently, so if same request is made, it should return same request all the time. The state of client does not matter.
-    - `Cacheable`: API must implement some caching algorithm to enhance performance
-    - `Decoupled`: Client and server applications in REST design must always be independent of each other. That's why we have front-end and back-end.
-    - `Layered`: REST style allows you to use layered system where you deploy API on server A, store data on server B, and authenticate in server C. 
-- Standard RESTful API HTTP methods include POST, PUT, PATCH, GET, DELETE.
-- Client sends requests typically in JSON format, which gets interpreted as HTTP requests by server. Server returns HTTP response, and API returns the HTTP response back in common formats like JSON/XML/HTML. 
-
-<i>I will elaborate and create REST based applications on other blog posts, but not here. </i>
-
-## 1.1 - RPC <a name="rpc"></a>
-
-The term [gRPC](https://grpc.io/docs/languages/python/basics/) comes in many locations in system design. It's a protocol developed by Google in 2016, but it's based on pre-existing concept of `Remote Procedure Call (RPC)`. The history of RPC is very old.
-
-<figure>
-<img src="
-https://devathon.com/blog/wp-content/uploads/sites/2/2019/09/New-Project-3.jpg
-" alt="osi">
-<figcaption>The idea of RPC goes back to 1980s, even before REST.</figcaption>
-</figure>
-
-RPC (remote Procedure call Protocol) is a remoting protocol that requests services from a remote computer program over a network without needing to know the underlying network technology. RPC is socket-based (will be discussed later), that is, working at the session level The RPC protocol assumes that some transport protocols exist, such as TCP or UDP, to carry information data between communication programs. So in terms of OSI model, you can say that RPC spans the transport and application tiers.
-
-<figure>
-<img src="
-https://www.ionos.com/digitalguide/fileadmin/DigitalGuide/Schaubilder/EN-rpc.png" alt="osi">
-<figcaption>In the simplest terms, RPCs enable you to connect to a network.</figcaption>
-</figure>
-
-
-The message structure of RPC requests are extremely simple, making it ideal microservcies exchanging many messages with each other. Client's request paramters are encoded from client stub, passed to server's stub to be decoded, and back and forth to exchange information. **Once a call is made in RPC, the calling environment is suspended while the process is handed over to the server and then executed. Once that procedure is finished, the results are shipped back to the client**. This is the query-response loop. RPC, therefore, excels in applications where control alternates between both parties. Execution in these implementations occurs synchronously.These custom contracts make RPC ideal for IoT applications — especially low-powered ones — where REST might otherwise struggle due to resource consumption. Conversely, REST truly excels in hypermedia-dependent scenarios, and scales extremely well. It can group many different resources together and serve them in the appropriate format to users.
-
-
-## 1.2 - gRPC <a name="grpc"></a>
-
-Now we have some idea about RPC, let's check what gRPC is. gRPC uses HTTP/2 protocols as transport protocol (TCP connection in the lower level), so it can be seen as layer 7.5 in the OSI model. Posts like [this](https://www.altexsoft.com/blog/what-is-grpc/) characterizes gRPC as architecture style like REST, but it's more of a protocol whether than a style. 
-
-<figure>
-<img src="https://grpc.io/img/grpc-core-stack.svg" alt="osi">
-<figcaption>gRPC is easily programmable using wrapper languages like Java, C++, Python and Go.</figcaption>
-</figure>
-
-gRPC leverages the simple, lightweight communication principle of RPC, and instead of JSON, gRPC messages are serialized using Protobuf, an efficient binary message format. Protobuf serializes very quickly on the server and client. Protobuf serialization results in small message payloads, important in limited bandwidth scenarios like mobile apps.
-
-| Feature                 | gRPC                               |    HTTP    |
-| :---------------------- | :--------------------------------- | :-------------------: |
-| `Protocol`                | HTTP/2                           | HTTP |
-| `Payload`                 | Protobuf                         |      JSON     |
-| `Browser Support`         | No                               |      Yes     |
-
-As you can see, gRPC extends HTTP/2 protocols. A major difference is the use of protobuf (protocol buffers). Parsing with Protocol Buffers is less CPU-intensive because data is represented in a binary format which minimizes the size of encoded messages. This means that message exchange happens faster, even in devices with a slower CPU like IoT or mobile devices. However, it's support for browsers are quite limited in many ways, and thus RESTful HTTP protocols are still being used in many areas despite the speed advantage of gRPC.  
-
-
-## 1.3 - Websockets <a name="rest_vs_socket"></a>
-
-Similar to gRPC, websocket can be seen as part of the application layer, extending HTTP protocols. WebSockets is communication channel, typically run from browsers connecting to Application Server over a protocol similar to HTTP that runs over TCP/IP, which is why it's called **websocket**. Below is an important picture to keep in mind:
-
-<figure>
-<img src="
-https://www.vaadata.com/blog/wp-content/uploads/2020/07/Schema-websockets-1.jpg" alt="osi">
-<figcaption>Websocket communicates over persistent TCP connection</figcaption>
-</figure>
-
-1. All webSocket connections start with an HTTP request with a header that requests an upgrade to the webSocket protocol. If the receiving server agrees, then the two sides switch protocols from HTTP to webSocket and from then on the connection uses the webSocket protocol
-2. **An HTTP starts sending data as responses only when a request is received, whereas Websockets send and receives data based on data availability**. This is why for cases like chat-apps, which requires bi-directional real time communication, websockets are preferred over http based communication. 
-2. websockets are over persistent TCP CONNECTION, whereas HTTP/2.0 requests are not necessarily persistent. But they are both over TCP connection.
-3. It makes no sense to compare REST and Websockets, as that is not comparing apples to apples.
-4. **Websockets and Sockets are completely different concepts.**
-
-
-# 2.0 - Layer 6: Presentation layer <a name="presentation"></a>
-
-Okay, now we have cleared all our confusion regarding REST, Websockets, and GRPC protocols, let's look at the lower layers. Layer 6 is presentation layer. This is a layer that the textbook does not even bother explaining (as the author regards this layer as part of application layer), but it's good to know that it exists. This is a layer that translates the data for the application layer. 
+Let's start from looking at some of the layers below application layers. Layer 6 is presentation layer. This is a layer that the textbook does not even bother explaining (as the author regards this layer as part of application layer), but it's good to know that it exists. This is a layer that translates the data for the application layer. 
 
 <figure>
 <img src="
@@ -138,7 +43,7 @@ And of course, the communication flows up and down, so decryption is also handle
 
 
 
-# 3.0 - Layer 5: Socket programming (Session layer) <a name="socket"></a>
+# 2.0 - Layer 5: Socket programming (Session layer) <a name="socket"></a>
 
 Layer 5 is the session layer. Session Layer is the first one where pretty much all practical matters related to the addressing, packaging and delivery of data are left behind—they are functions of layers four and below. It is the lowest of the three upper layers, which collectively are concerned mainly with software application issues and not with the details of network and internet implementation. The name of this layer tells you much about what it is designed to do: to allow devices to establish and manage sessions. In general terms, a session is a persistent logical linking of two software application processes, to allow them to exchange data over a prolonged period of time. In some discussions, these sessions are called dialogs; they are roughly analogous to a telephone call made between two people.
 
@@ -163,7 +68,7 @@ https://qph.cf2.quoracdn.net/main-qimg-08868215079c2d3cd56fc659ddbdf9e5" alt="os
 </figure>
 
 
-# 4.0 - Transport layer <a name="transport"></a>
+# 3.0 - Transport layer <a name="transport"></a>
 
 In the application layer, messages are generated with the HTTP protocols, hits the sockets in the session layer, waiting to be carried over the network over two transport layer protocol options --- TCP/IP and UDP/IP. This is where messages are chopped into smaller segments (TCP or UDP segments), packaged as IP packets, and delivered down through the pipeline. Apart from above, there are actually several other important procedures running behind the scenes to ensure the best outcome, as TCP and UDP both use IP to communicate, but <b>IP (network layer) is unreliable, as datagrams can overflow router buffers and never reach their destination, datagrams can arrive out of order, and bits in the datagram can get corrupted (flipped from 0 to 1 and vice versa)</b>. Therefore transport layers must have logics to minimize these errors.
 
@@ -174,7 +79,7 @@ https://www.baeldung.com/wp-content/uploads/sites/4/2021/07/1.jpg" alt="transpor
 </figure>
 
 
-## 4.1 - Layer 4: Multiplexing and Demultiplexing <a name="plexing"></a>
+## 3.1 - Layer 4: Multiplexing and Demultiplexing <a name="plexing"></a>
 
 An important function of transport layer, is not only to deliver a message, but it also needs to correctly deliver the message to the process requesting the message. Each process running in the application can have multiple sockets, doors used to exchange data. `Multiplexing` is the process running on the sender side, which aggregates data from each socket, and encapsulating with transport headers, passing to the network layer.   
 
@@ -195,7 +100,7 @@ The client side operation equivalent to this is `demultiplexing`, reading the da
 
 Generally speaking, application developers do not have to worry about these, but it's great to know about theoretical aspects of it. 
 
-## 4.2 - Layer 4: Closer look at UDP <a name="udp"></a>
+## 3.2 - Layer 4: Closer look at UDP <a name="udp"></a>
 
 We already know that when using UDP, there is no additional procedures like doing handshakes (**This is why it's called connectionless**), so the application almost directly talks with IP. Network layer encapsulates information from UDP to datagram, and using the destination port information, it will try it's best to deliver the messages to the correct location. Unlike TCP, there is no congestion control or retry mechanism to counter dataloss. But instead, UDP just blasts away at full speed to minimize any delay in retrival of data. This is why DNS service use UDP whether than UDP, the very first thing that runs when loading browser, because the speed matters the most. 
 
@@ -215,9 +120,26 @@ Both TCP and UDP operate on **IP (network layer protocol), which is unreliable c
 
 UDP does have `checksum` to determine whether bites within UDP segment have been altered (e.g accidental noise inserted when passing network/router). But the problem is, although UDP does provide error checking mechanism, **it does not do anything to recover from an error**. Damaged segment is usually just ignored, or passed with a warning. 
 
-## 4.3 - Layer 4: Closer look at TCP <a name="tcp"></a>
+**Below is a very important picture to have in mind**
 
-We looked at UDP, so of course we need to take a look at TCP as well. Recall TCP has these features: 
+<figure>
+<img src="https://cdn.kastatic.org/ka-perseus-images/9d185d3d44c7ef1e2cd61655e47befb4d383e907.svg" alt="segment">
+<figcaption>The IP data section is the UDP segment, which itself contains header and data sections.</figcaption>
+</figure>
+
+
+## 3.3 - Layer 4: Closer look at TCP <a name="tcp"></a>
+
+We looked at UDP, so of course we need to take a look at TCP as well. **Below is a very important picture to have in mind as well**. 
+
+<figure>
+<img src="https://cdn.kastatic.org/ka-perseus-images/e5fdf560fdb40a1c0b3c3ce96f570e5f00fff161.svg" alt="segment">
+<figcaption>The IP data section is the TCP segment, which itself contains header and data sections.</figcaption>
+</figure>
+
+The TCP segment (that will be discussed more down below) resides inside the IP packet of the network layer. The idea is the same as UDP. 
+
+And also recall TCP has these features: 
 
 **1. full-duplex service**: TCP connection established via 3 way handshake SYN/ACK each other. And this connection is full duplex. If there is a TCP connection between Process A on one host and Process B on another host, then application-layer data can flow from Process A to Process B at the same time as application-layer data flows from Process B to Process A.
 
@@ -254,4 +176,99 @@ The seq number is sent by the TCP client, indicating how much data has been sent
 1. either (1) the receiver (server) immediately discards out-of-order segments 
 2. or (2) the receiver keeps the out-of-order bytes and waits for the missing bytes to fill in the gaps (makes much more sense to save bandwidth)
 
-Initial sequence number (seq) is not necessarily 0. It is often chosen as a random number. 
+Initial sequence number (seq) is not necessarily 0. It is often chosen as a random number. Furthermore, TCP has `checksum` feature like UDP. 
+
+
+<figure>
+<img src="http://www.tcpipguide.com/free/diagrams/tcppseudocalc.png" alt="segment">
+<figcaption>TCP pseudo header is first constructed and placed, logically, before the TCP segment. The checksum is then calculated over both the pseudo header and the TCP segment. The pseudo header is then discarded.</figcaption>
+</figure>
+
+<i>The CheckSum of the TCP is calculated by taking into account the TCP Header, TCP body and Pseudo IP header</i>. When the TCP segment arrives at its destination, the receiving TCP software performs the same calculation. It forms the pseudo header, prepends it to the actual TCP segment, and then performs the checksum (setting the Checksum field to zero for the calculation as before). If there is a mismatch between its calculation and the value the source device put in the Checksum field, this indicates that an error of some sort occurred and the segment is normally discarded. The sequence numbering and checksum does not necessarily solve all the problems that can happen, but it's aleast much more reliable than UDP that does not even have retry logic, and does not gaurantee that the packet will reach the destination.  
+
+ 
+**3.4 - TCP Connection Management (TCP State)**
+
+Before talking about contestion controls, let's see elaborate on how TCP makes and tears down connections. During the life of a TCP connection, the TCP protocol running in each host makes transitions through various TCP states. Let's say that client wants to establish connection with the server. 
+
+1. `Step 1: Syn Segment`: TCP state is **CLOSED** initially. The client side sends special TCP segment (SYN bit) with no application data. Randomly chooses sequence starting number (**server_isn**) and forwards to the server. Enters **SYN_SENT** state.
+2. `Step 2: SynACK Segment`: The server receives TCP SYN segment, allocates TCP buffers and variables to the connection, chooses initial sequence number (**server_isn + 1**), and sends receive acknowledgment call (SYNACK bit) back to client.  
+3. `Step 3: Handshake suceeded`: Upon receiving SYNACK, the client also prepares TCP buffers and variables. Client sends last segment to the server, signaling it will start sending data. Connection entered **ESTABLISHED** state. 
+4. `Step 4: Close call`: Upon finishing data transfer, the client sends the server special TCP segment that sets FIN bit to 1. By this, connection enters **FIN_WAIT_1** state.
+5. `Step 5: Close received`: Server receives close call, and sends acknowledgement bit back. Enters **FIN_WAIT_2**.
+6. `Step 6: Tear down complete`: Client receives ACK. TCP connection enters **TIME_WAIT** state (typically 30 seconds, but varies), which safely tears down the connection by resending tear down ACK call in case not properly sent, and releases all resouces in the client. 
+
+<figure>
+<img src="./tcpstate.png" alt="segment">
+<figcaption>On the client side, the TCP state would look like this</figcaption>
+</figure>
+
+<figure>
+<img src="./tcp_server.png" alt="segment">
+<figcaption>The server side will also go through similar cycle.</figcaption>
+</figure>
+
+
+# 4.0 - Layer 4: Flow/Congestion Management <a name="congestion"></a>
+
+Here are the last bits of the Transport layer. 
+
+**Flow Control (Receiver imposing restrictions)**
+
+In a typical client-server model, there is possibility that receiver overflows the receiver's buffer (which causes unwanted data drop), especially when there is difference in bandwidth, where sender can send more data than the amount that receiver can process. **Flow control matches the speed**, and this is done by sender maintaing a variable called `receive window`. Informally, the receive window is used to give the sender an idea of how much free buffer space is available at the receiver, and this would be calculated differently for every connections. Let's say host A wants to send a large file to host B. 
+
+- `LastByteRead`: the number of the last byte in the data stream read from the buffer by the application process in B
+- `LastByteRcvd`: the number of the last byte in the data stream that has arrived from the network and has been placed in the receive buffer at B
+- `RcvBuffer`: Amount of extra space left in the buffer.
+
+$$ 
+\begin{align*}
+rwnd = RcvBuffer - [LastByteRcvd-LastByteRead]
+\end{align*}
+$$
+
+So if LastByteRcvd is 100, and LastByteRead is 50, and RcvBuffer is 60, it will receive window will be calculated as 60 - (100-50) = 10. The TCP receive window size is the amount of receive data (in bytes) that can be buffered during a connection. The sending host can send only that amount of data before it must wait for an acknowledgment and window update from the receiving host. So if there is only 10 bytes left in the buffer, it would need to wait until receiver empties and the available buffer fills up again. 
+
+<i>UDP does not use any flow control technique, and it is only available for TCP</i>
+
+**What is Network Congestion?**
+
+`Network Congestion` is simply when too many sources attempt to send data at too high rate. For end-user, network congestions comes back to them as:
+- High latency 
+- Connection timeouts 
+- Packet losses
+
+<i>What causes congestion? </i> Well there are many reasons.
+
+- Excessive bandwidth consumpsion
+- Poor subnet management. Instead of receiving data from close-by location, you receive it from very far network. 
+- Broadcast storm (sudden upsurge in number of requests to a network)
+- Multicasting where data transmission is addressed to a group of destination computers simultaneously. This will cause slow down. 
+- Border Gateway Protocol (BGP) that routes traffic to shortest pass, but drives everyone to the same location
+
+**TCP Congestion Control (sender imposing restrictions)**
+
+The cause of network congestion varies in so many different ways, and it's impossible to wait until it gets solved. So there are congestion control mechanism that exists at TCP level (<i>Obviously UDP has none of these congestion control mechanism</i>), so even if the network is not performing as well as it should, applications can still communicate as effciently as possible without worsening the problem. Flow control is imposed by the receiver, whereas **TCP congestion control gets executed by sender measuring network congestion, and automatically adjusting the rate it sends**. 
+
+Is flow control and receive window not sufficient? Unfortunately no.
+
+Senders would send their packets into the Internet as fast as the advertised window would allow, congestion would occur at some router (causing packets to be dropped), and the hosts would time out and retransmit their packets, resulting in even more congestion. This is why Sender also needs to know how to adjust accordingly. TCP uses something called `Congestion Window`, similar to receive window, to tell sender to slow down. 
+
+<figure>
+<img src="https://encyclopedia.pub/media/common/202107/blobid20-60f5467ae42de.jpeg" alt="segment">
+<figcaption>Congestion Control</figcaption>
+</figure>
+
+Congestion Windows are used by the source to limit how much data it is allowed to have in transit at a given time. There are multiple ways how to scale up and down the congestion window, and to initialze them (rapid start vs slow start, etc). Based on the observation regarding packets not delivered and timeout results, each TCP connections can measure level of congestions, and figure out how to control the windows (**addictive-increase, multiplicative decreate (AIMD)**)
+
+There are many variations of TCP congestion control algorithms, which gave birth to things like:
+
+- TCP Reno and TCP Tahoe (classic approach)
+- TCP Cubic
+- DCTCP
+- CTCP
+- BBR
+
+which application developers rarely need to worry about, so will not be discussed in this post. 
+
+On the next post, I will be elaborating on the final layers of the OSI model (network, data link, physical layer), to finish off the networking series. 
