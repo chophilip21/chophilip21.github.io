@@ -26,7 +26,7 @@ app = FastAPI()
 async def root():
     return {"message": "to be or not to be"}
 
-# uvicorn main:app --reload
+# uvicorn sample_1:app --reload
 # http://127.0.0.1:8000/docs ---> Integrates well with the swagger dashboard. 
 ```
 
@@ -34,6 +34,6 @@ And it integrates nicely with the [Swagger UI](https://swagger.io/tools/swagger-
 
 ## Second example: Movies
 
-Now we are going to work with other methods in rest: `PUT`, `POST`, `DELETE`. The data structure gets managed with [Pydantic](https://docs.pydantic.dev/install/).
+Now we are going to work with other methods in rest: `PUT`, `POST`, `DELETE`. If you are building an application or a web API, it’s rarely the case that you can put everything on a single file. So in order to keep all the files working as an application as a whole, we define a `APIRouter` and call the router across multiple modules. Additionally, the data structure gets managed with [Pydantic](https://docs.pydantic.dev/install/). Pydantic acts as an intuitive data validator.
 
 

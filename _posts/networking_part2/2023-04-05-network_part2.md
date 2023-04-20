@@ -1,5 +1,5 @@
 ---
-title: Networking part 2 - Lower Layers (What about API?)
+title: Networking part 2 - Transport Layers (What about API?)
 date: 2023-04-05 09:58:47 +07:00
 modified: 2023-04-06 16:49:47 +07:00
 tags: [networking, OSI]
@@ -165,7 +165,7 @@ https://qph.cf2.quoracdn.net/main-qimg-08868215079c2d3cd56fc659ddbdf9e5" alt="os
 
 # 4.0 - Transport layer <a name="transport"></a>
 
-In the application layer, messages are generated with the HTTP protocols, hits the sockets in the session layer, waiting to be carried over the network over two transport layer protocol options --- TCP/IP and UDP/IP. This is where messages are chopped into smaller segments (TCP or UDP segments), packaged as IP packets, and delivered down through the pipeline. Apart from above, there are actually several other important procedures running behind the scenes to ensure the best outcome.   
+In the application layer, messages are generated with the HTTP protocols, hits the sockets in the session layer, waiting to be carried over the network over two transport layer protocol options --- TCP/IP and UDP/IP. This is where messages are chopped into smaller segments (TCP or UDP segments), packaged as IP packets, and delivered down through the pipeline. Apart from above, there are actually several other important procedures running behind the scenes to ensure the best outcome, as TCP and UDP both use IP to communicate, but <b>IP (network layer) is unreliable, as datagrams can overflow router buffers and never reach their destination, datagrams can arrive out of order, and bits in the datagram can get corrupted (flipped from 0 to 1 and vice versa)</b>. Therefore transport layers must have logics to minimize these errors.
 
 <figure>
 <img src="
@@ -174,7 +174,7 @@ https://www.baeldung.com/wp-content/uploads/sites/4/2021/07/1.jpg" alt="transpor
 </figure>
 
 
-## 3.1 - Layer 4: Multiplexing and Demultiplexing <a name="plexing"></a>
+## 4.1 - Layer 4: Multiplexing and Demultiplexing <a name="plexing"></a>
 
 An important function of transport layer, is not only to deliver a message, but it also needs to correctly deliver the message to the process requesting the message. Each process running in the application can have multiple sockets, doors used to exchange data. `Multiplexing` is the process running on the sender side, which aggregates data from each socket, and encapsulating with transport headers, passing to the network layer.   
 
@@ -195,7 +195,7 @@ The client side operation equivalent to this is `demultiplexing`, reading the da
 
 Generally speaking, application developers do not have to worry about these, but it's great to know about theoretical aspects of it. 
 
-## 3.1 - Layer 4: Closer look at UDP <a name="udp"></a>
+## 4.2 - Layer 4: Closer look at UDP <a name="udp"></a>
 
 We already know that when using UDP, there is no additional procedures like doing handshakes (**This is why it's called connectionless**), so the application almost directly talks with IP. Network layer encapsulates information from UDP to datagram, and using the destination port information, it will try it's best to deliver the messages to the correct location. Unlike TCP, there is no congestion control or retry mechanism to counter dataloss. But instead, UDP just blasts away at full speed to minimize any delay in retrival of data. This is why DNS service use UDP whether than UDP, the very first thing that runs when loading browser, because the speed matters the most. 
 
@@ -215,12 +215,43 @@ Both TCP and UDP operate on **IP (network layer protocol), which is unreliable c
 
 UDP does have `checksum` to determine whether bites within UDP segment have been altered (e.g accidental noise inserted when passing network/router). But the problem is, although UDP does provide error checking mechanism, **it does not do anything to recover from an error**. Damaged segment is usually just ignored, or passed with a warning. 
 
-## 3.2 - Layer 4: Closer look at TCP <a name="tcp"></a>
+## 4.3 - Layer 4: Closer look at TCP <a name="tcp"></a>
 
 We looked at UDP, so of course we need to take a look at TCP as well. Recall TCP has these features: 
 
-**1. full-duplex service**: If there is a TCP connection between Process A on one host and Process B on another host, then application-layer data can flow from Process A to Process B at the same time as application-layer data flows from Process B to Process A.
+**1. full-duplex service**: TCP connection established via 3 way handshake SYN/ACK each other. And this connection is full duplex. If there is a TCP connection between Process A on one host and Process B on another host, then application-layer data can flow from Process A to Process B at the same time as application-layer data flows from Process B to Process A.
 
 **2. point to point**: transfer is always between one sender and one receiver. one sender cannot send data to multiple receiver at once. There needs to be multiple connections in that case. 
 
-**3. Three way handshake**: 
+We know how the tunnel gets constructed, but how does the data actually flow from Application A (client) and Application B (server)?
+
+<figure>
+<img src="https://miro.medium.com/v2/resize:fit:828/format:webp/1*603nZyZo3vGCBVckmqUtrA.png" alt="segment">
+<figcaption>You need to understand how TCP buffers work.</figcaption>
+</figure>
+
+
+Let's say sender wishes to send 4000 bytes of data to server. These data gets encapsulated and written to the socket, and appended to `Send Buffer`. The TCP kernel break up the data into series of TCP packets. Typically, the default size of a packet on Linux systems is **1500 bytes (Maximum Transmission Unit)**, with the first **24 bytes being the packet header**; 
+
+<figure>
+<img src="https://cdn.kastatic.org/ka-perseus-images/337190cba133e19ee9d8b5878453f915971a59cd.svg" alt="segment">
+<figcaption>TCP header is 20 bytes in size excluding the Options field. 12 bytes more than UDP header.</figcaption>
+</figure>
+
+
+This means a single packet can hold 1476 bytes of application data. To send 4000 bytes of application data, the Kernel will need to send three packets, last one containing less data than the first two. The receiving side catches these transmitted data and writes to `Receive buffer`. Application developers do not need to worry about buffer sizes, but the maximum buffer sizes can be tuned. 
+
+**How do you know that data is being transferred correctly in order?**
+
+<figure>
+<img src="https://i0.wp.com/madpackets.com/wp-content/uploads/2018/04/tcp-seq-ack-flow-e1524681839913.png?resize=538%2C756&ssl=1" alt="segment">
+<figcaption>TCP Sequence (seq) and Acknowledgement (ack) numbers help enable ordered reliable data transfer for TCP streams.</figcaption>
+</figure>
+
+
+The seq number is sent by the TCP client, indicating how much data has been sent for the session (also known as the byte-order number). The ack number is sent by the TCP server, indicating that is has received cumulated data and is ready for the next segment. In this case, server responds (with ACK receipt) saying that it is now expecting sequence number 670 to be coming. The next segment the client sends has seq=670 and the len is now 1460 bytes. In turn, the server responds with ack=2130 (670 + 1460). This cycle continues until the end of the TCP session. The server knows the entire length of the data, and the order of the bytes via byte-order numbers, so if anything goes missing or comes in a wrong order:
+
+1. either (1) the receiver (server) immediately discards out-of-order segments 
+2. or (2) the receiver keeps the out-of-order bytes and waits for the missing bytes to fill in the gaps (makes much more sense to save bandwidth)
+
+Initial sequence number (seq) is not necessarily 0. It is often chosen as a random number. 
