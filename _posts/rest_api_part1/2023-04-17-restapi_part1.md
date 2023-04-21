@@ -119,7 +119,7 @@ https://www.vaadata.com/blog/wp-content/uploads/2020/07/Schema-websockets-1.jpg"
 
 I have briefly touched upon REST APIs theories, and now it's time to build one!
 
-My knowledge for building REST APIs are quite rusty, as the last time I coded any RESTful application was during my studies at SFU for a class project, which is years back. Surprisingly for my jobs I never really had to build one, so I definitely need to review it now as it doesn't make sense for a software developer to not know how to build one. In terms of the backend framework, I have experience with `Flask` in the past, and it is more than sufficient for proof of concepts. But I always wanted to try learning how to use [Fast API](https://fastapi.tiangolo.com/tutorial/#install-fastapi), as I heard that it has much smoother learning curve than `Django`, and much faster speed as it is light-weighted. Plus I will be working on things that are beyond proof of concepts, so I thought it would be great to tackle some new stuff at this point. 
+My knowledge for building REST APIs are quite rusty, as the last time I coded any RESTful application was during my studies at SFU for a class project, which is years back. Surprisingly for my jobs I never really had to build one, so I definitely need to review it now as it doesn't make sense for a software developer to not know how to build one. In terms of the backend framework, I have experience with `Flask` in the past, and it is more than sufficient for proof of concepts. But I always wanted to try learning how to use [Fast API](https://fastapi.tiangolo.com/tutorial/#install-fastapi), as I heard that it has much smoother learning curve than `Django`, and much faster speed as it is light-weighted. Plus I will be working on things that are beyond proof of concepts, so I thought it would be great to step a foot into some new stuff at this point. 
 
 
 ## 2.1 - FastAPI basic examples <a name="example_1"></a>
@@ -327,18 +327,6 @@ you need to return [proper codes](https://www.restapitutorial.com/httpstatuscode
 - Server error responses (500 – 599)
 
 Awesome. It deletes when the url exists, and correctly returns can't delete message (Error 404) when no matching url is found.  Finally, the last part of the code is updating using `PUT`. The way it works, is similar to how `POST` work. 
-
-```py
-@app.put("/api/v1/put/movies/{movie_id}", status_code=200)
-async def update_movie(movie_id: str, movie: Movie):
-    """Update a movie"""
-    for index, movie in enumerate(dummy_movies):
-        if movie.id == movie_id:
-            # override the index when matches.
-            dummy_movies[index] = movie
-            return {"id": movie.id, "message": "Movie updated successfully"}
-    raise HTTPException(status_code=404, detail="Movie not found")
-```
 
 You need to provide id to the endpoint, and when particular ID matches to that in the tmp db, replace it with the JSON body that you are providing. 
 
