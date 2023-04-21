@@ -10,5 +10,7 @@ usemathjax: true
 # Table of contents
 - [Layer 3: Network layer](#network)
 
+In the [previous post](https://chophilip21.github.io/network_part2/), I have reviewed layers under application layer, like the transport layer. I will cover the remaining layers in this post. 
 
 # 1.0 - Application Layer <a name="network"></a>
+

@@ -17,7 +17,7 @@ class MovieGenre(str, Enum):
 class Movie(BaseModel):
     """Movie model"""
 
-    id: Optional[int] = None  # Optional[int] is equivalent to Union[int, None]
+    id: Optional[str] = None  # Optional[int] is equivalent to Union[int, None]
     Name: str
     rating: Union[int, float]  # use Union to allow multiple types
     director: str
@@ -27,7 +27,7 @@ class Movie(BaseModel):
 class Cinema(BaseModel):
     """Cinema model. Recursively use Movie model."""
 
-    id: int
+    id: Optional[str] = None  # Optional[int] is equivalent to Union[int, None]
     Name: str
     location: str
     movies: list[Movie]  # use list[Movie] to specify a list of Movie objects

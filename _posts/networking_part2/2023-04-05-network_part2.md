@@ -18,7 +18,7 @@ usemathjax: true
 - [Layer 4: Flow/Congestion Management](#congestion)
 
 
-In the [previous post](https://chophilip21.github.io/network_part1/), I have covered the basics of Networking, mostly around the top application layers of the OSI model. I will cover the lower layers of the OSI model in this post. But before diving, don't forget that OSI models are in both directions:
+In the [previous post](https://chophilip21.github.io/network_part1/), I have covered the basics of Networking, mostly around the top application layers of the OSI model. I will cover the lower layers of the OSI model in this post, especially on Layer 4 where many important events occur. But before diving, don't forget that OSI models are in both directions:
 
 <figure>
 <img src="
@@ -26,6 +26,7 @@ https://www.researchgate.net/publication/224631234/figure/fig1/AS:66909365706342
 <figcaption>OSI models can be interpreted in both directions, depending on who you are (sender vs receiver) </figcaption>
 </figure>
 
+Instead of uni-directional pyramid model, always think of the U-shaped bi-directional model.
 
 # 1.0 - Layer 6: Presentation layer <a name="presentation"></a>
 
@@ -180,7 +181,7 @@ Initial sequence number (seq) is not necessarily 0. It is often chosen as a rand
 
 
 <figure>
-<img src="http://www.tcpipguide.com/free/diagrams/tcppseudocalc.png" alt="segment">
+<img src="https://media.geeksforgeeks.org/wp-content/uploads/20200329123142/TCP11.png" alt="segment">
 <figcaption>TCP pseudo header is first constructed and placed, logically, before the TCP segment. The checksum is then calculated over both the pseudo header and the TCP segment. The pseudo header is then discarded.</figcaption>
 </figure>
 
@@ -271,4 +272,4 @@ There are many variations of TCP congestion control algorithms, which gave birth
 
 which application developers rarely need to worry about, so will not be discussed in this post. 
 
-On the next post, I will be elaborating on the final layers of the OSI model (network, data link, physical layer), to finish off the networking series. 
+On the [next post](https://chophilip21.github.io/network_part3/), I will be elaborating on the final layers of the OSI model (network, data link, physical layer), to finish off the networking series. 

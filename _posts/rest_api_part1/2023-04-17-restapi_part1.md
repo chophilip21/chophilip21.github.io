@@ -142,11 +142,9 @@ async def root():
 
 And it integrates nicely with the [Swagger UI](https://swagger.io/tools/swagger-ui/) interactive session. 
 
-use `async` when you need support for `await`. Otherwise `def` is totally fine. Read [here](https://fastapi.tiangolo.com/async/) for concurrency and parallelism, otherwise no need for now. 
+use `async` when you need support for `await`. Otherwise `def` is totally fine. Read [here](https://fastapi.tiangolo.com/async/) for concurrency and parallelism, otherwise no need for now. It seems it's not really important which one you choose at the moment. 
 
-**Second example: Movies**
-
-Codes can be found [here](https://github.com/chophilip21/chophilip21.github.io/blob/master/_posts/rest_api_part1/sample_2.py).
+**Let's code our own example: Movies**. Codes can be found [here](https://github.com/chophilip21/chophilip21.github.io/blob/master/_posts/rest_api_part1/sample_2.py).
 
 Now we are going to work with other methods in rest: `PUT`, `POST`, `DELETE`. If you are building an application or a web API, it’s rarely the case that you can put everything on a single file. So in order to keep all the files working as an application as a whole, we define a `APIRouter` and call the router across multiple modules. Additionally, the data structure gets managed with [Pydantic](https://docs.pydantic.dev/install/). Pydantic acts as an intuitive data validator, which allows you to pass datatypes like statically typed languages, or dynamically typed languages using `Optional` keyword. 
 
@@ -167,7 +165,7 @@ class MovieGenre(str, Enum):
 class Movie(BaseModel):
     """Movie model"""
 
-    id: Optional[int] = None  # Optional[int] is equivalent to Union[int, None]
+    id: Optional[str] = None  # Optional[int] is equivalent to Union[int, None]
     Name: str
     rating: Union[int, float]  # use Union to allow multiple types
     director: str
@@ -183,34 +181,34 @@ class Cinema(BaseModel):
     movies: list[Movie]  # use list[Movie] to specify a list of Movie objects
 ```
 
-And created some dummy data that goes with it:
+We are not using any DB at the moment, so create a temporary list that can store the data. Lets make unique ids with UUID. And add some dummy data that goes with it:
 
 ```py
 # create a list of dummy movies
 dummy_movies: List[Movie] = [
     Movie(
-        id=1,
+        id=str(uuid.uuid4()),
         Name="The Shawshank Redemption",
         rating=9.2,
         director="Frank Darabont",
         genre=MovieGenre.drama,
     ),
     Movie(
-        id=2,
+        id=str(uuid.uuid4()),
         Name="The Godfather",
         rating=9.2,
         director="Francis Ford Coppola",
         genre=MovieGenre.drama,
     ),
     Movie(
-        id=3,
+        id=str(uuid.uuid4()),
         Name="The Dark Knight",
         rating=9.0,
         director="Christopher Nolan",
         genre=MovieGenre.action,
     ),
     Movie(
-        id=4,
+        id=str(uuid.uuid4()),
         Name="Lost in translation",
         rating=8.3,
         director="Sofia Coppola",
@@ -221,18 +219,19 @@ dummy_movies: List[Movie] = [
 # create a list of dummy cinemas
 cinema_list: List[Cinema] = [
     Cinema(
-        id=1,
+        id=str(uuid.uuid4()),
         Name="Cinema 1",
         location="Location 1",
         movies=random.choices(dummy_movies, k=3),
     ),
     Cinema(
-        id=2,
+        id=str(uuid.uuid4()),
         Name="Cinema 2",
         location="Location 2",
         movies=random.choices(dummy_movies, k=2),
     ),
 ]
+
 ```
 
 Code should be self-explanatory. To make things a little more interesting, Cinemas will randomly get assigned movies from the movie list. And now lets create very basic method that returns all possible cinemas and movies. 
@@ -256,39 +255,38 @@ curl -X 'GET' \
   'http://127.0.0.1:8000/api/v1/cinemas' \
   -H 'accept: application/json'
 
-#output
 [
   {
-    "id": 1,
+    "id": "56b799c8-37a5-4589-af25-e50fe746a4c1",
     "Name": "Cinema 1",
     "location": "Location 1",
     "movies": [
       {
-        "id": 3,
+        "id": "168c414d-8a42-4009-a82f-24d47740a3e4",
         "Name": "The Dark Knight",
         "rating": 9,
         "director": "Christopher Nolan",
         "genre": "action"
       },
       {
-        "id": 3,
-        "Name": "The Dark Knight",
-        "rating": 9,
-        "director": "Christopher Nolan",
-        "genre": "action"
+        "id": "292239f8-4fa2-47a8-aaa2-cf8a9dad230e",
+        "Name": "Lost in translation",
+        "rating": 8,
+        "director": "Sofia Coppola",
+        "genre": "romance"
       },
       {
-        "id": 1,
-        "Name": "The Shawshank Redemption",
-        "rating": 9,
-        "director": "Frank Darabont",
-        "genre": "drama"
+        "id": "292239f8-4fa2-47a8-aaa2-cf8a9dad230e",
+        "Name": "Lost in translation",
+        "rating": 8,
+        "director": "Sofia Coppola",
+        "genre": "romance"
       }
     ]
   },
 ]
 ```
 
-Awesome. Now let's add functions that are little more interesting. 
+Awesome. Now let's add functions that are little more interesting. Let's add a `POST` method to add some data to our list. Instead of `app.get`, all we have to do is define `app.post`. Because it's a different method, we can use the same endpoint.
 
 
