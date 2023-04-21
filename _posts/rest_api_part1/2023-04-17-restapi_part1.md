@@ -13,10 +13,9 @@ usemathjax: true
 - [What is gRPC?](#grpc)
 - [What are Websockets?](#rest_vs_socket)
 - [Intro to REST API](#coding)
-- [FastAPI Examples](#exampels_1)
+- [FastAPI Basic Examples](#exampels_1)
 
-In my [previous blog post](https://chophilip21.github.io/network_part2/), I studied basics of networking from reading James F. Kurose's Networking Top Down Approach. After reading the texbook, I realized that the textbook does not mention some of the common software engineering terms like REST, SOAP, Websocket, GraphQL, and etc. And obviously this isn't because the author is reckless, but it's because architectural style or frameworks don't technically belong in the definition of OSI model. In this post, I would like to talk about architectural styles that is very important for application developers, and ways to code them using Python. 
-
+In my [previous blog post](https://chophilip21.github.io/network_part2/), I studied basics of networking from reading James F. Kurose's Networking Top Down Approach. After reading the texbook, I realized that the textbook does not address some of the common software engineering terms like REST, SOAP, Websocket, GraphQL, and etc. Obviously this isn't because of the author's ineptitude, but it's because architectural style or frameworks don't technically belong in the definition of OSI model. But they are very important topics without a question, and I would like to review various architectural styles and ways to code them using Python in this post.  
 
 # 1.0 - REST (protocol vs architecture) <a name="rest"></a>
 
@@ -123,7 +122,7 @@ I have briefly touched upon REST APIs theories, and now it's time to build one!
 My knowledge for building REST APIs are quite rusty, as the last time I coded any RESTful application was during my studies at SFU for a class project, which is years back. Surprisingly for my jobs I never really had to build one, so I definitely need to review it now as it doesn't make sense for a software developer to not know how to build one. In terms of the backend framework, I have experience with `Flask` in the past, and it is more than sufficient for proof of concepts. But I always wanted to try learning how to use [Fast API](https://fastapi.tiangolo.com/tutorial/#install-fastapi), as I heard that it has much smoother learning curve than `Django`, and much faster speed as it is light-weighted. Plus I will be working on things that are much beyond proof of concepts, so I thought it would be great to tackle some new stuff. 
 
 
-## 2.1 - FastAPI examples <a name="example_1"></a>
+## 2.1 - FastAPI basic examples <a name="example_1"></a>
 
 Running FastAPI Hello World very easy.
 
@@ -143,8 +142,153 @@ async def root():
 
 And it integrates nicely with the [Swagger UI](https://swagger.io/tools/swagger-ui/) interactive session. 
 
+use `async` when you need support for `await`. Otherwise `def` is totally fine. Read [here](https://fastapi.tiangolo.com/async/) for concurrency and parallelism, otherwise no need for now. 
+
 **Second example: Movies**
 
-Now we are going to work with other methods in rest: `PUT`, `POST`, `DELETE`. If you are building an application or a web API, it’s rarely the case that you can put everything on a single file. So in order to keep all the files working as an application as a whole, we define a `APIRouter` and call the router across multiple modules. Additionally, the data structure gets managed with [Pydantic](https://docs.pydantic.dev/install/). Pydantic acts as an intuitive data validator.
+Codes can be found [here](https://github.com/chophilip21/chophilip21.github.io/blob/master/_posts/rest_api_part1/sample_2.py).
+
+Now we are going to work with other methods in rest: `PUT`, `POST`, `DELETE`. If you are building an application or a web API, it’s rarely the case that you can put everything on a single file. So in order to keep all the files working as an application as a whole, we define a `APIRouter` and call the router across multiple modules. Additionally, the data structure gets managed with [Pydantic](https://docs.pydantic.dev/install/). Pydantic acts as an intuitive data validator, which allows you to pass datatypes like statically typed languages, or dynamically typed languages using `Optional` keyword. 
+
+Defined dummy Movie class (with Enum for genre) and Cinema class using Pydantic:
+
+```py
+class MovieGenre(str, Enum):
+    """Movie genre enum"""
+
+    action = "action"
+    comedy = "comedy"
+    horror = "horror"
+    romance = "romance"
+    thriller = "thriller"
+    drama = "drama"
+
+
+class Movie(BaseModel):
+    """Movie model"""
+
+    id: Optional[int] = None  # Optional[int] is equivalent to Union[int, None]
+    Name: str
+    rating: Union[int, float]  # use Union to allow multiple types
+    director: str
+    genre: MovieGenre  # use MovieGenre enum
+
+
+class Cinema(BaseModel):
+    """Cinema model. Recursively use Movie model."""
+
+    id: int
+    Name: str
+    location: str
+    movies: list[Movie]  # use list[Movie] to specify a list of Movie objects
+```
+
+And created some dummy data that goes with it:
+
+```py
+# create a list of dummy movies
+dummy_movies: List[Movie] = [
+    Movie(
+        id=1,
+        Name="The Shawshank Redemption",
+        rating=9.2,
+        director="Frank Darabont",
+        genre=MovieGenre.drama,
+    ),
+    Movie(
+        id=2,
+        Name="The Godfather",
+        rating=9.2,
+        director="Francis Ford Coppola",
+        genre=MovieGenre.drama,
+    ),
+    Movie(
+        id=3,
+        Name="The Dark Knight",
+        rating=9.0,
+        director="Christopher Nolan",
+        genre=MovieGenre.action,
+    ),
+    Movie(
+        id=4,
+        Name="Lost in translation",
+        rating=8.3,
+        director="Sofia Coppola",
+        genre=MovieGenre.romance,
+    ),
+]
+
+# create a list of dummy cinemas
+cinema_list: List[Cinema] = [
+    Cinema(
+        id=1,
+        Name="Cinema 1",
+        location="Location 1",
+        movies=random.choices(dummy_movies, k=3),
+    ),
+    Cinema(
+        id=2,
+        Name="Cinema 2",
+        location="Location 2",
+        movies=random.choices(dummy_movies, k=2),
+    ),
+]
+```
+
+Code should be self-explanatory. To make things a little more interesting, Cinemas will randomly get assigned movies from the movie list. And now lets create very basic method that returns all possible cinemas and movies. 
+
+```py
+@app.get("/api/v1/movies", status_code=200)
+async def get_all_movies():
+    """Get all movies"""
+    return dummy_movies
+
+@app.get("/api/v1/cinemas", status_code=200)
+async def get_all_cinemas():
+    """Get all movies"""
+    return cinema_list
+```
+
+And check the output by starting up the application and accessing the url. You should get something like this:
+
+```bash
+curl -X 'GET' \
+  'http://127.0.0.1:8000/api/v1/cinemas' \
+  -H 'accept: application/json'
+
+#output
+[
+  {
+    "id": 1,
+    "Name": "Cinema 1",
+    "location": "Location 1",
+    "movies": [
+      {
+        "id": 3,
+        "Name": "The Dark Knight",
+        "rating": 9,
+        "director": "Christopher Nolan",
+        "genre": "action"
+      },
+      {
+        "id": 3,
+        "Name": "The Dark Knight",
+        "rating": 9,
+        "director": "Christopher Nolan",
+        "genre": "action"
+      },
+      {
+        "id": 1,
+        "Name": "The Shawshank Redemption",
+        "rating": 9,
+        "director": "Frank Darabont",
+        "genre": "drama"
+      }
+    ]
+  },
+]
+```
+
+Awesome. Now let's add functions that are little more interesting. 
 
 
