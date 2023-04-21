@@ -1,5 +1,5 @@
 ---
-title: Rest API Part 1 - Building examples
+title: Rest API Part 1 - Building basic examples
 date: 2023-04-17 15:44:47 +07:00
 modified: 2023-04-17 16:49:47 +07:00
 tags: [python, restapi]
@@ -13,7 +13,7 @@ usemathjax: true
 - [What is gRPC?](#grpc)
 - [What are Websockets?](#rest_vs_socket)
 - [Intro to REST API](#coding)
-- [FastAPI Basic Examples](#exampels_1)
+- [FastAPI Basic Examples](#example_1)
 
 In my [previous blog post](https://chophilip21.github.io/network_part2/), I studied basics of networking from reading James F. Kurose's Networking Top Down Approach. After reading the texbook, I realized that the textbook does not address some of the common software engineering terms like REST, SOAP, Websocket, GraphQL, and etc. Obviously this isn't because of the author's ineptitude, but it's because architectural style or frameworks don't technically belong in the definition of OSI model. But they are very important topics without a question, and I would like to review various architectural styles and ways to code them using Python in this post.  
 
@@ -119,7 +119,7 @@ https://www.vaadata.com/blog/wp-content/uploads/2020/07/Schema-websockets-1.jpg"
 
 I have briefly touched upon REST APIs theories, and now it's time to build one!
 
-My knowledge for building REST APIs are quite rusty, as the last time I coded any RESTful application was during my studies at SFU for a class project, which is years back. Surprisingly for my jobs I never really had to build one, so I definitely need to review it now as it doesn't make sense for a software developer to not know how to build one. In terms of the backend framework, I have experience with `Flask` in the past, and it is more than sufficient for proof of concepts. But I always wanted to try learning how to use [Fast API](https://fastapi.tiangolo.com/tutorial/#install-fastapi), as I heard that it has much smoother learning curve than `Django`, and much faster speed as it is light-weighted. Plus I will be working on things that are much beyond proof of concepts, so I thought it would be great to tackle some new stuff. 
+My knowledge for building REST APIs are quite rusty, as the last time I coded any RESTful application was during my studies at SFU for a class project, which is years back. Surprisingly for my jobs I never really had to build one, so I definitely need to review it now as it doesn't make sense for a software developer to not know how to build one. In terms of the backend framework, I have experience with `Flask` in the past, and it is more than sufficient for proof of concepts. But I always wanted to try learning how to use [Fast API](https://fastapi.tiangolo.com/tutorial/#install-fastapi), as I heard that it has much smoother learning curve than `Django`, and much faster speed as it is light-weighted. Plus I will be working on things that are beyond proof of concepts, so I thought it would be great to tackle some new stuff at this point. 
 
 
 ## 2.1 - FastAPI basic examples <a name="example_1"></a>
@@ -140,13 +140,13 @@ async def root():
 # http://127.0.0.1:8000/docs ---> Integrates well with the swagger dashboard. 
 ```
 
-And it integrates nicely with the [Swagger UI](https://swagger.io/tools/swagger-ui/) interactive session. 
+And it integrates nicely with the [Swagger UI](https://swagger.io/tools/swagger-ui/) interactive session, very powerful way to debug your code. 
 
 use `async` when you need support for `await`. Otherwise `def` is totally fine. Read [here](https://fastapi.tiangolo.com/async/) for concurrency and parallelism, otherwise no need for now. It seems it's not really important which one you choose at the moment. 
 
 **Let's code our own example: Movies**. Codes can be found [here](https://github.com/chophilip21/chophilip21.github.io/blob/master/_posts/rest_api_part1/sample_2.py).
 
-Now we are going to work with other methods in rest: `PUT`, `POST`, `DELETE`. If you are building an application or a web API, it’s rarely the case that you can put everything on a single file. So in order to keep all the files working as an application as a whole, we define a `APIRouter` and call the router across multiple modules. Additionally, the data structure gets managed with [Pydantic](https://docs.pydantic.dev/install/). Pydantic acts as an intuitive data validator, which allows you to pass datatypes like statically typed languages, or dynamically typed languages using `Optional` keyword. 
+Now we are going to work with other methods in RESTful application: `PUT`, `POST`, `DELETE`. If you are building an application or a web API, it’s rarely the case that you can put everything on a single file. So in order to keep all the files working as an application as a whole, we define a `APIRouter` and call the router across multiple modules. Additionally, the data structure gets managed with [Pydantic](https://docs.pydantic.dev/install/). Pydantic acts as an intuitive data validator, which allows you to pass datatypes like statically typed languages, or dynamically typed languages using `Optional` keyword. 
 
 Defined dummy Movie class (with Enum for genre) and Cinema class using Pydantic:
 
@@ -222,13 +222,13 @@ cinema_list: List[Cinema] = [
         id=str(uuid.uuid4()),
         Name="Cinema 1",
         location="Location 1",
-        movies=random.choices(dummy_movies, k=3),
+        movies=random.sample(dummy_movies, 3),
     ),
     Cinema(
         id=str(uuid.uuid4()),
         Name="Cinema 2",
         location="Location 2",
-        movies=random.choices(dummy_movies, k=2),
+        movies=random.sample(dummy_movies, 2),
     ),
 ]
 
@@ -237,12 +237,12 @@ cinema_list: List[Cinema] = [
 Code should be self-explanatory. To make things a little more interesting, Cinemas will randomly get assigned movies from the movie list. And now lets create very basic method that returns all possible cinemas and movies. 
 
 ```py
-@app.get("/api/v1/movies", status_code=200)
+@app.get("/api/v1/get/movies", status_code=200)
 async def get_all_movies():
     """Get all movies"""
     return dummy_movies
 
-@app.get("/api/v1/cinemas", status_code=200)
+@app.get("/api/v1/get/cinemas", status_code=200)
 async def get_all_cinemas():
     """Get all movies"""
     return cinema_list
@@ -275,18 +275,90 @@ curl -X 'GET' \
         "director": "Sofia Coppola",
         "genre": "romance"
       },
-      {
-        "id": "292239f8-4fa2-47a8-aaa2-cf8a9dad230e",
-        "Name": "Lost in translation",
-        "rating": 8,
-        "director": "Sofia Coppola",
-        "genre": "romance"
-      }
     ]
   },
 ]
 ```
 
-Awesome. Now let's add functions that are little more interesting. Let's add a `POST` method to add some data to our list. Instead of `app.get`, all we have to do is define `app.post`. Because it's a different method, we can use the same endpoint.
+Awesome. Now let's add functions that are little more interesting. Let's add a `POST` method to add some data to our list. Instead of `app.get`, all we have to do is define `app.post`. 201 is the convention for creating a new content. 
+
+```py
+@app.post("/api/v1/post/movies", status_code=201)
+async def add_movie(movie: Movie):
+    """Add a movie"""
+    dummy_movies.append(movie)
+    return {"id": movie.id, "message": "Movie added successfully"}
+```
+
+Unlike simple `GET` function that returns an object upon reaching endpoint, above won't work as it is without passing JSON body. Use API clients like `Postman` or `Thunderbolt`. Let's post below. 
+
+```py
+{
+"id": "989450b2-9256-431b-976e-a274ac67ec72",
+"Name": "ocean's eleven",
+"rating": 9,
+"director": "Steven Soderbergh",
+"genre": "action"
+}
+```
+
+If you post it, and hit the endpoint for getting movies, you should see the new entries poping up. 
+Now let's also implement `DELETE`. The difference here is that we have a dynamic parameter in the endpoint for the user ID, so that you can delete specific entry--Ocean's eleven that we just added. 
+
+```py
+@app.delete("/api/v1/delete/movies/{movie_id}", status_code=200)
+async def delete_movie(movie_id: str):
+    """Delete a movie"""
+    for movie in dummy_movies:
+        if movie.id == movie_id:
+            dummy_movies.remove(movie)
+            return {"id": movie.id, "message": "Movie deleted successfully"}
+    raise HTTPException(status_code=404, detail="Movie not found")
+
+# Pretty self explanatory. The endpoint we want to hit is: http://127.0.0.1:8000/api/v1/delete/movies/989450b2-9256-431b-976e-a274ac67ec72
+```
+
+Note, when the url does not exist, **we need to raise appropriate error**.
+you need to return [proper codes](https://www.restapitutorial.com/httpstatuscodes.html):
+- Informational responses (100 – 199)
+- Successful responses (200 – 299)
+- Redirection messages (300 – 399)
+- Client error responses (400 – 499)
+- Server error responses (500 – 599)
+
+Awesome. It deletes when the url exists, and correctly returns can't delete message (Error 404) when no matching url is found.  Finally, the last part of the code is updating using `PUT`. The way it works, is similar to how `POST` work. 
+
+```py
+@app.put("/api/v1/put/movies/{movie_id}", status_code=200)
+async def update_movie(movie_id: str, movie: Movie):
+    """Update a movie"""
+    for index, movie in enumerate(dummy_movies):
+        if movie.id == movie_id:
+            # override the index when matches.
+            dummy_movies[index] = movie
+            return {"id": movie.id, "message": "Movie updated successfully"}
+    raise HTTPException(status_code=404, detail="Movie not found")
+```
+
+You need to provide id to the endpoint, and when particular ID matches to that in the tmp db, replace it with the JSON body that you are providing. 
+
+```py
+@app.put("/api/v1/put/movies/{movie_id}")
+async def update_movie(movie_id: str, movie_obj: Movie):
+    """Update a movie"""
+    for index, movie in enumerate(dummy_movies):
+        if movie.id == movie_id:
+            dummy_movies[index] = movie_obj
+            return {"id": movie.id, "message": "Movie updated successfully"}
+    raise HTTPException(status_code=404, detail="Movie not found")
+```
+
+Fairly straight forward! Instead of providing the entire JSON body, if you can patch certain objects partially by calling `PATCH` as well. Okay so we now have some idea about the basics of FAST API. 
 
 
+<figure>
+<img src="./complete.png" alt="osi">
+<figcaption>Fast API Swagger dashboard should look like this.</figcaption>
+</figure>
+
+On the next post, I will take API coding to the next level, and probably a good idea is to have a seperate repository for that instead of adding all the files under blog posts. Other topics like `gRPC` or `Websocket` programming will be created as seperate posts. 
