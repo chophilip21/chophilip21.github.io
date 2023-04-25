@@ -8,14 +8,32 @@ usemathjax: true
 ---
 
 # Table of contents
-- [Layer 3: Inside the router](#router)
+
+- [Layer 3: Network layer: Data plane](#network)
+- [Layer 3: Dataplane: Inside the router](#router)
 - [Layer 3: IP protocols](#ip)
-- [Layer 3: Network layer: Dataplane](#network)
+- [Layer 3: Network layer: Control Plane](#control)
 
-In the [previous post](https://chophilip21.github.io/network_part2/), I have reviewed layers under application layer, like the transport layer. I will cover the remaining layers in this post. 
+In the [previous post](https://chophilip21.github.io/network_part2/), I have reviewed layers under application layer, like the transport layer. I will cover the remaining layers in this post. While working with VPN and SSH projects, I have already studied a lot of basic ideas related to networking, but network layers are arguably the most complex layer in the protocol stack according to the author, thus it is good idea to study it again throughly.
 
-While working with VPN and SSH projects, I have already studied a lot of basic ideas related to networking, but network layers are arguably the most complex layer in the protocol stack according to the author, thus 
-it is good idea to study it again throughly. The purpose that the network layers serve is quite complex. In terms of just looking at primary goal, the main purpose is to transport segments from end-to-end.
+# 1.0 - Network Layer: Dataplane  <a name="network"></a>
+
+<figure>
+<img src="./ControlPlanePunting.png" alt="osi">
+<figcaption>Network layer can be decomposed into dataplane and control plane</figcaption>
+</figure>
+
+
+The author divides the Network layer into two parts:
+
+- Data plane (**logics for individual router**, determines how datagram arriving on router input port is forwarded to router output port)
+    - `Forwarding`: Move packets from router's input to appropriate router output
+- Control plane (**logics for network-wide control of the flow of datagrams**, determines how datagram is routed among routers along end-end path from source host to destination host. )
+    - `Routing`: Determine route taken by packets from source to destination
+
+Some people use both terms (Forwarding, routing) interchangeably, but the author insists on clear distinctions b/w the two. 
+
+We will look into Data planes first, but before we do dive into it, let's try to understand the ideas behind network layers. The purpose that the network layers serve is quite complex. In terms of just looking at primary goal, the main purpose is to transport segments from end-to-end.
 
 <figure>
 <img src="./flow.png" alt="osi">
@@ -34,16 +52,16 @@ But there are other service requirements that network layers should also fulfill
 
 Above are partial list of services that <i>network could provide</i>. But in practice, guaranteeing all above service requirements in the network layer is very difficult, often not possible, and that is why we implement complex error checking logic in upper layers.  
 
-# 1.0 - Inside the router <a name="router"></a>
+## 1.1 - Dataplane: Inside the router <a name="router"></a>
 
-An important thing to understand is that **routers are essentially a specialized computers**. It has CPU and memory to temporarily and permanently store data to execute OS instructnions, such as system initialization, routhing functions, and switching functions. 
+Dataplane is all about forwarding datagrams to the router, thus it makes most sense to dig on the routers first. An important thing to understand is that **routers are essentially a specialized computers**. It has CPU and memory to temporarily and permanently store data to execute OS instructnions, such as system initialization, routhing functions, and switching functions. 
 
 <figure>
 <img src="https://cdn.thewirecutter.com/wp-content/media/2022/03/wifi-router-2048px-4639.jpg" alt="osi">
 <figcaption>Routers have CPU and RAM</figcaption>
 </figure>
 
-Routers have Ramdom Access Memory (RAM) for temporary storage of IP routing table, Ethernet ARP table, and running configuration files. It has Read-Only Memory (ROM) for storing permanent bootup instructions. It has Flash drive for storing IOS and other system related files. A router of course does not have video adapters or sound card adapters. Instead, routers have specialized ports and network interface cards to interconnect devices to other networks. 
+Routers have Ramdom Access Memory (RAM) for temporary storage of IP routing table, Ethernet ARP table, and running configuration files. It has Read-Only Memory (ROM) for storing permanent bootup instructions. It has Flash drive for storing IOS and other system related files. A router of course does not have video adapters or sound card adapters. Instead, routers have specialized ports and network interface cards to interconnect devices to other networks.
 
 In terms of networking, there are four router components that can be identified:
 
@@ -67,7 +85,7 @@ Let's start from visiting what happens in the input ports.
 - Once forwarding table decides which output port to direct the inputs, inputs get sent to the `switching fabric` (or sometimes queued in the input port if router has scheduling mechanism).
 
 <figure>
-<img src="http://www2.ic.uff.br/~michael/kr1999/4-network/swtchin.gif" alt="osi">
+<img src="https://forum.huawei.com/enterprise/en/data/attachment/forum/202111/14/224542nbwwk9aqis381bap.png" alt="osi">
 <figcaption>Input port processing</figcaption>
 </figure>
 
@@ -109,7 +127,7 @@ Similar to input port, queueing is often implemented to effciently resolve traff
 The routing processor performs control-plane functions (which will be discussed later). In traditional routers, it executes the routing protocols, maintains routing tables and attached link state information, and computes the forwarding table for the router. 
 
 
-# 1.1 - IP protocol <a name="ip"></a>
+## 1.2 - IP protocol <a name="ip"></a>
 
 Things like IPv4, IPv6, NAT, are topics that I have already covered across multiple other posts, like [here](https://chophilip21.github.io/openssh/). So to just fill up some of the gaps, length of IPv4 address are 32 bits, where each 4 decial numbers represent 4 bytes, (0-255).(0-255).(0.255).(0.255) - (in binary notation, something like 11000001 00100000 11011000 00001001). IPv6 will be 128 bits, but in this case, things like checksum is no longer required. 
 
@@ -140,24 +158,15 @@ In terms of network interconnecting, group of hosts and router forms `subnet`.
 <figcaption>A subnet is also called IP network. Think of this as a network within a network.</figcaption>
 </figure>
 
-A router assigns subnet an internal IP address via `subnet mask`, and hosts attached to this subnet will follow the IP pattern of the subnets like the above figure. 
+A router assigns subnet an internal IP address via `subnet mask`, and hosts attached to this subnet will follow the IP pattern of the subnets like the above figure. Hosts within the same subnet can talk directly to each other without having to go through routers, just like how we made the [SSH connections](https://chophilip21.github.io/openssh_part3/) via VPN.
 
 **Network Address Translation (NAT)**
 
 This is another familar concept. IPV4 is limited in terms of availability, and when routers assign hosts private IP addresses using things like `Dynamic Host Configuration Protocol (DHCP)`, many hosts in the world will end-up with the same IP address, which makes it impossible for hosts to send and receive packets from the global Internet. NAT-enabled routers will allow hosts to access the internet via router's public IP, and any responses coming back from the internet will hit router's `NAT translation table` to direct the requests back to the hosts who requested.  
 
 
+# 2.0 Network layer: Control Plane <a name="control"></a>
 
-# 2.0 - Network Layer: Dataplane  <a name="network"></a>
-
-Now that we went over routers and IPs, let's revisit network layer. The author divides network layer into two components: 
-
-1. Data plane (**logics for individual router**, and how it forwards it to output links of the router)
-2. Control plane (**logics for network-wide control of the flow of datagrams**)
-
-<figure>
-<img src="./ControlPlanePunting.png" alt="osi">
-<figcaption>Network layer can be decomposed into dataplane and control plane</figcaption>
-</figure>
+For the past few sections, we looked at the Data plane related concepts, which are things that's happening within individual routers, at a more micro-level. Now it's time to look at **Control Plane, which deals with the macro, network-wide logic** that not only controls how datagram is routed from one router to another, but also how each components and services are configured and managed. Control plane's main idea is regarding routing algorithms, where routers find the "best route" to deliver data, to minimize time delay and communication cost of packet transmission.    
 
 
