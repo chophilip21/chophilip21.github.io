@@ -24,10 +24,10 @@ usemathjax: true
 - [Video streaming: TCP/UDP](#video)
 
 
-While studying the basics of networking in the [previous post](https://chophilip21.github.io/openssh_part2/), I realized that there are much more underlying contents related to it that I must know as a professional software engineer. At universities, it usually takes more than one semesters two fully cover all the essential topics related to networking, something that I missed as I did not study computer science for my undergraduate studies. I wanted to fill up this gap of knowledge, and my colleague recommended ["Computer Networking: A Top-Down Approach"](http://gaia.cs.umass.edu/kurose_ross/online_lectures.htm) by James F.Kurose and Keith W.Ross. I will be summarizing the core ideas that are relevant to me, and adding my thoughts to it in the next few blog posts.
+While studying the basics of networking in the [previous post](https://chophilip21.github.io/openssh_part2/), I realized that there are much more underlying contents related to it that I must know as a professional software engineer. At universities, it usually takes more than one semesters two fully cover all the essential topics related to networking, something that I missed as I did not study computer science for my undergraduate studies. Now that I am working on infrastructure system, the need to fill up this gap of knowledge became increasingly important. I heard that ["Computer Networking: A Top-Down Approach"](http://gaia.cs.umass.edu/kurose_ross/online_lectures.htm) by James F.Kurose and Keith W.Ross is one of the best networking books out there, thus I will be summarizing the core ideas that are relevant to me, and adding my thoughts to it in the next few blog posts.
 
 # 1.0 - Application Layer <a name="application_layer"></a>
-As the name of the book suggests, it talks about the 7 layers of the Open Systems Interconnection (OSI) model -- which describes the system that computers use to communicate over a network -- in a reverse order that is more intuitive to understand.  
+The author goes over the 7 layers of Open Systems Interconnection (OSI) model, which describes the layers that computers use to communicate over a network. Each layers are explained in a reverse order that is more intuitive to understand.  
 
 <figure>
 <img src="
@@ -35,7 +35,7 @@ https://s7280.pcdn.co/wp-content/uploads/2018/06/osi-model-7-layers-1024x734.jpg
 <figcaption>OSI model has seven layers. </figcaption>
 </figure>
 
-And the first layer in the OSI model is the `Application Layer,` which is the end-user layer that most of the people interact with, such as browser programs running in the user's host (desktop, laptop, tablet, phone), streaming contents from Netflix servers. When you are writing applications in languages like C, Java and Python, you just need to consider how applications talk to the network, and you never really have to consider how it would communicate within routers and other lower layers down the line. So naturally, whether than considering the entire 7 layers of the OSI model, application developers can solely focus on the `application architecture`.
+The first layer of the OSI model is the `Application Layer,` which is the end-user layer that most of the people interact with, such as browser programs running in the user's host (desktop, laptop, tablet, phone), streaming contents from Netflix servers. When you are writing applications in languages like C, Java and Python, you just need to consider how applications talk to the network, and you never really have to consider how it would communicate within routers and other lower layers down the line. So naturally, whether than considering the entire 7 layers of the OSI model, application developers can solely focus on the `application architecture`.
 
 ## 1.1 - Client-server architecture <a name="client_server"></a>
 
@@ -169,6 +169,14 @@ And there is the concept of **Caching**. Requests for images and other heavier d
 <img src="./caching.png" alt="http">
 <figcaption>Caching speeds up loading time</figcaption>
 </figure>
+
+The author depicts **Proxy Server** in the context of web caching, where intermediary server (with IP address) satisfies the HTTP requests on behalf of the original Web Server. But you need to understand that <i>Proxy Servers can be both server and a client, sending requests to server on behalf of the client, and responding on behalf of the server</i>. On top of caching, it does:
+- Filtering content
+- Scan for malware
+- Mask origin of the request
+- Encrypt messages
+- Handle authentication requests (serve as firewall) 
+- Prevent attackers from accessing private network
 
 
 ## 2.1 - HTTP (Persistent vs None-Persistent)<a name="persist"></a>
