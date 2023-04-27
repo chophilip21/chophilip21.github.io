@@ -9,16 +9,25 @@ usemathjax: true
 
 # Table of contents
 
-- [Layer 3 - Network layer: Data plane](#network)
+- [Layer 3 - Network layer overview](#overview)
 - [Layer 3 - Dataplane: Inside the router](#router)
 - [Layer 3 - IP protocols](#ip)
 - [Layer 3 - Network layer: Control Plane](#control)
 - [Layer 3 - Intra-AS Routing in the Internet (OSPF)](#ospf)
 - [Layer 3 - Inter-AS Routing: BGP](#bgp)
 
-In the [previous post](https://chophilip21.github.io/network_part2/), I have reviewed layers under application layer, like the transport layer. I will cover the remaining layers in this post. While working with VPN and SSH projects, I have already studied a lot of basic ideas related to networking, but network layers are arguably the most complex layer in the protocol stack according to the author, thus it is good idea to study it again throughly.
+In the [previous post](https://chophilip21.github.io/network_part2/), I have reviewed layers under application layer, like the transport layer. I will cover the Network layer in this post. While working with VPN and SSH projects, I have already studied a lot of basic ideas related to networking layers, but this layer is arguably the most complex layer in the protocol stack according to the author. A lot of the concepts covered in this chapter are very particular, probably not required to be studied deeply unless you are a network engineer. I will not cover all the details listed in the book, but it is still a good idea to observe some of the important ideas, so that I can have understanding of the topic.  
 
-# 1.0 - Network Layer: Dataplane  <a name="network"></a>
+
+# 1.0 - Network Layer: Overview  <a name="overview"></a>
+
+The author divides the Network layer into two parts:
+
+- Data plane (logics for individual router, determines how datagram arriving on router input port is forwarded to router output port)
+    - `Forwarding`: Move packets from router's input to appropriate router output
+- Control plane (logics for network-wide control of the flow of datagrams, determines how datagram is routed among routers along end-end path from source host to destination host. )
+    - `Routing`: Determine route taken by packets from source to destination
+    - `Routing table` focuses on calculating changes in the network topology, includes entries of IPs to be used for text hop. 
 
 <figure>
 <img src="./ControlPlanePunting.png" alt="osi">
@@ -26,16 +35,33 @@ In the [previous post](https://chophilip21.github.io/network_part2/), I have rev
 </figure>
 
 
-The author divides the Network layer into two parts:
+Some people use both terms (Forwarding, routing) interchangeably, but the author insists on clear distinctions b/w the two. **Below is the summary of the most important ideas in the chapter**
 
-- Data plane (**logics for individual router**, determines how datagram arriving on router input port is forwarded to router output port)
-    - `Forwarding`: Move packets from router's input to appropriate router output
-- Control plane (**logics for network-wide control of the flow of datagrams**, determines how datagram is routed among routers along end-end path from source host to destination host. )
-    - `Routing`: Determine route taken by packets from source to destination
+| Forwarding                                                                                 | Routing                                                                     |
+| ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| Transfers the incoming packets from input port to the appropriate output port in a router. | Determines the route taken by the packets from source to their destination. |
+| Uses the forwarding table.                                                                 | Creates the forwarding tables.                                              |
+| Determines local forwarding at this router                                                 | Determines end-to-end path through network                                  |
+| Done in hardware at link speeds (very fast).                                               | Done at time scales of minutes or hours.                                    |
+| Also known as “data plane”.                                                                | Also known as “control plane”.                                              |
 
-Some people use both terms (Forwarding, routing) interchangeably, but the author insists on clear distinctions b/w the two. 
+When routers connect to each other, a routing table is created for each of the connected routers. A routing table stores the destination IP address of each network that can be reached through that router. One of the important applications of a routing table is to prevent loops in a network. When a router receives a packet, it forwards the packet to the next hop following its routing table. A routing loop may occur if the next hop isn’t defined in the routing table. In order to prevent such loops, we use a routing table to stop forwarding packets to networks that can’t be reached through that router. This will be discussed further in the control plane section. 
 
-We will look into Data planes first, but before we do dive into it, let's try to understand the ideas behind network layers. The purpose that the network layers serve is quite complex. In terms of just looking at primary goal, the main purpose is to transport segments from end-to-end.
+<figure>
+<img src="https://www.baeldung.com/wp-content/uploads/sites/4/2022/10/Routing-Table.drawio.png" alt="osi">
+<figcaption>The router table contains the destination address, next hop address, and interface information.</figcaption>
+</figure>
+
+A forwarding table simply forwards the packets received in intermediate switches. It’s not responsible for selecting a path and only involves forwarding the packets to another attached network. It's responsible of sending network data to its destination port (recall concepts we learned during SSH)
+
+<figure>
+<img src="../openssh_part2/How-port-forwading-works-1.jpg
+" alt="osi">
+<figcaption>Idea is the same, forwarding table tells which input should go to which output port</figcaption>
+</figure>
+
+
+**Where does Network layer belong in OSI model?**
 
 <figure>
 <img src="./flow.png" alt="osi">
@@ -55,6 +81,8 @@ But there are other service requirements that network layers should also fulfill
 Above are partial list of services that <i>network could provide</i>. But in practice, guaranteeing all above service requirements in the network layer is very difficult, often not possible, and that is why we implement complex error checking logic in upper layers.  
 
 ## 1.1 - Dataplane: Inside the router <a name="router"></a>
+
+Let's take a look at Dataplane first.
 
 Dataplane is all about forwarding datagrams to the router, thus it makes most sense to dig on the routers first. An important thing to understand is that **routers are essentially a specialized computers**. It has CPU and memory to temporarily and permanently store data to execute OS instructnions, such as system initialization, routhing functions, and switching functions. 
 
@@ -248,3 +276,13 @@ The idea of **Border Gateway Protocol (BGP)** is straight forward. If OSPF is fo
 
 Since an inter-AS routing protocol involves coordination among multiple ASs, communicating ASs must run the same inter-AS routing protocol. This can be understood as how every country has its own languages, but to communicate with each other, they have to speak universal languages like English. <i>In BGP, packets are not routed to a specific destination address, but instead to CIDRized prefixes, with each prefix representing a subnet or a collection of subnets </i>
 
+<figure>
+<img src="https://docs.vmware.com/en/VMware-Telco-Cloud-Service-Assurance/2.0.1/npm-bgp-user-guide-201/images/GUID-CF9767BF-852D-4143-8847-85ECDE2DAEB2-low.png" alt="bus">
+<figcaption>Say that there are three Autonomous Systems, A1, A2, and A3. </figcaption>
+</figure>
+
+- BGP connections b/w routers in the same AS is called `Internal BGP (iBGP)` connection
+- BGP connections b/w different AS is called `External BGP (eBGP)`.
+- BGP would also have it's own algorithm to determine best routes, how to hop between A/S while minimizing expenses, but this is outside the scope so won't be discussed in detail. 
+
+There are a few other topics in the book for this chapter, such as SDN, ICMP, SNMP, NETCONF/YANG, and etc, but these will not be discussed here. 
