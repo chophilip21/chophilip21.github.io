@@ -1,10 +1,9 @@
 ---
-title: Docker part 1 - Learn Docker in a Month of Lunches
+title: Docker part 1 - Creating simple application with Docker Compose
 date: 2023-04-10 11:58:47 +07:00
-modified: 2023-04-11 16:49:47 +07:00
-tags: [docker]
+modified: 2023-04-28 16:49:47 +07:00
+tags: [docker, Python, microservice]
 description: Basics of Docker
-image: "/openssh_part2/How-port-forwading-works-1.jpg"
 usemathjax: true
 ---
 
@@ -19,9 +18,7 @@ usemathjax: true
 
 # 1.0 - Docker. How much do you know?  <a name="preface"></a>
 
-If you are software engineer with some experience, it's very likely that you would have had some exposures to [Docker](https://www.docker.com/). Distributed systems and containers have taken over the world, and essentially every applications out there is containerized these days. Naturally, there are immense amount of contents associated with Docker beyond simple image build, pull, etc, and a lot of the sophisticated tools like [Kubernetes](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/), [Terraform](https://www.terraform.io/), [Ansible](https://www.ansible.com/), and etc operate on top of containers. 
-
-For my work, I need to learn how to use Terraform with Dockers, but before I dive into Terraform, it would be great to check how much I know about Docker. So that is why I decided to start reading a popular book called [Learn Docker in a Month of Lunches](https://github.com/sixeyed/diamol), and check how much I know about Docker, and fill up any gaps that might exist in my knowledge. 
+If you are software engineer with some experience, it's very likely that you would already have some experience with [Docker](https://www.docker.com/). Distributed systems and containers have taken over the world, and essentially every applications out there is containerized these days. Naturally, there are immense amount of contents associated with Docker beyond simple image build, pull, etc, and a lot of the sophisticated tools like [Kubernetes](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/), [Terraform](https://www.terraform.io/), [Ansible](https://www.ansible.com/), and etc operate on top of containers. For my work, I need to learn how to use Terraform but before I dive into Terraform, I thought it would be good to check how much I know about Docker and maybe fill up some gaps.
 
 <figure>
 <img src="
@@ -29,12 +26,12 @@ https://cloudblogs.microsoft.com/wp-content/uploads/sites/37/2019/07/Demystifyin
 <figcaption>The difference b/w Vms and Docker Containers</figcaption>
 </figure>
 
-I am not going over the conceptual aspects of Docker in detail, but to give you a high-level overview, Docker is open source platform that offers container services. Containers are lightweight Virtual Machines (VM), and they leverage features of the host operating system to isolate processes and control the processes’ access to CPUs, memory and desk space. Unlike VMs that uses hypervisor that virtualizes physical hardware, containers virtualize the operating system (typically Linux or Windows) so each individual container contains only the application and its libraries and dependencies, allowing the applications to be ran on any operating system without conflicts.
-
-And typically applications would have more than one containers running. Application would consist multiple instances of containers (i.e Microservices) that are in charge of different aspects of the app, hosted in the virtual cloud like Elastic Container Registry (ECR), talking to each other over virtual network without being explosed to the internet.
+Docker is open source platform that offers container services. Containers are lightweight Virtual Machines (VM), and they leverage features of the host operating system to isolate processes and control the processes’ access to CPUs, memory and desk space. Unlike VMs that uses hypervisor that virtualizes physical hardware, containers virtualize the operating system (typically Linux or Windows) so each individual container contains only the application and its libraries and dependencies, allowing the applications to be ran on any operating system without conflicts.And typically applications would have more than one containers running. Application would consist multiple instances of containers (i.e Microservices) that are in charge of different aspects of the app, hosted in the virtual cloud like Elastic Container Registry (ECR), talking to each other over virtual network without being explosed to the internet.
 
 
 # 1.1 - Basics of Docker <a name="basics"></a>
+
+Below is an example taken from the book [Learn Docker in a Month of Lunches](https://github.com/sixeyed/diamol).
 
 Okay now we reviewed what Docker is, and why we are using it. Let's do the very basics according to the outline of the book. Assuming you have [Docker installed in your environment](https://docs.docker.com/desktop/install/linux-install/) already, let's dive straight to it. I won't even bother pulling pre-existing images and doing interactions with them, because I assume that we all already know how to do that. 
 
@@ -128,7 +125,7 @@ layer cache is used.
 
 # 2.0 - Distributed Application: My Python Example - News Summarizer <a name="python"></a>
 
-Part one of the book was quite straight forward, just getting to know basic functionalities of Docker using Dockerfiles. Most applications don’t run in one single component. Even large old apps are typically built as frontend and backend components, which are separate logical layers running in physically distributed components. Docker is ideally suited to running distributed applications—from n-tier monoliths to modern microservices. Each component runs in its own lightweight container, and Docker plugs them together using standard network protocols. This involves defining `Docker Compose`.
+Most applications don’t run in one single component. Even large old apps are typically built as frontend and backend components, which are separate logical layers running in physically distributed components. Docker is ideally suited to running distributed applications—from n-tier monoliths to modern microservices. Each component runs in its own lightweight container, and Docker plugs them together using standard network protocols. This involves defining `Docker Compose`.
 
 One thing that I absolutely hate doing, is blindly following the textbook and running codes that someone else has written for you. This does not help learning in any ways, especially since these codes are not written in Python (Java, Javascript, etc). Best thing to do is defining your own examples. This is a very simple application, as it only has two parts to it, backend, and frontend. The codes can be found in this [repository](https://github.com/chophilip21/docker_test). Here is the general outline:
 
@@ -386,4 +383,97 @@ st.markdown(st.session_state.summary)
 
 ## 2.3 - News Summarizer Dockerfiles <a name="ex_dockerfiles"></a>
 
-And of course there is the docker compose file and dockerfiles that glues everything together, and actually run things in harmony. 
+And of course there is the docker compose file and dockerfiles that glues everything together, and actually run things in harmony. First of all, `Docker Compose` file that wraps things together. Here, I am providing `ENV` file so that I do not have to hardcode the port number for FRONT and BACK. In terms of functionality, defining `COMMAND` in Docker Compose and defining it inside Dockerfile, shows no difference. So I am defining backend command to start a backend server in the Docker Compose. 
+
+```bash
+
+# docker compose --env-file=./config.env build
+# docker compose --env-file=./config.env up
+
+# docker-compose.yml
+version: '3.8'
+services:
+  backend:
+    build: ./webscrapper
+    ports:
+      - ${BACKEND_PORT}:${BACKEND_PORT}
+    volumes:
+      - ./webscrapper:/app
+    command: uvicorn main:app --reload --host 0.0.0.0 --port ${BACKEND_PORT}
+    networks:
+      default:
+        aliases:
+            - backend
+
+  streamlit-app:
+    build: ./front
+    container_name: streamlitapp
+    depends_on:
+      - backend 
+    ports:
+      - ${FRONTEND_PORT}:${FRONTEND_PORT}
+    working_dir: /usr/src/app
+```
+
+You can see from above that I am defining the backend network alias as `backend`, so that I do not have to hardcode any IP addresses for the frontend to receive the data from the backend. 
+
+**Front Dockerfile**
+
+And of course, you need the actual Docker files for frontend and backend. I am defining frontend start command inside the Dockerfile, but this could be defined inside Docker Compose file as well.  
+
+```bash
+# reduced python as base image
+FROM python:3.8-slim-buster 
+
+# set a directory for the app
+WORKDIR /usr/src/app 
+
+# copy all the files to the container
+COPY . . 
+
+# pip install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+# RUN apt-get -y update; apt-get -y install curl
+
+# expose port in the environment. 
+EXPOSE ${FRONTEND_PORT} 
+
+# command that is run when container is started
+HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
+
+ENTRYPOINT ["streamlit", "run", "main.py", "--server.port=8501", "--server.address=0.0.0.0"]
+```
+
+**Backend Dockerfile**
+
+Backend is even more simple. All that is happening here is copying the files over to the container, downloading requirement files. The backend needs Pytorch, so you can technically use the `Pytorch` containers as well. 
+
+```bash
+
+FROM python:3.9
+# FROM nvcr.io/nvidia/pytorch:23.04-py3
+
+WORKDIR /app
+
+#copy to cache for faster run
+COPY ./requirements.txt /code/requirements.txt
+
+RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+
+# copy the everything over to container
+COPY ./ /app/
+```
+
+**End Result**
+
+According to the front design, two buttons generate input and output. We can confirm that everything works as it should: 
+
+![test](./article_1.png)
+
+And the summary is generated perfectly as well. 
+
+![test](./summary.png)
+
+Awesome, in the next post, I will try to improve this simple summary app. 
+
+
