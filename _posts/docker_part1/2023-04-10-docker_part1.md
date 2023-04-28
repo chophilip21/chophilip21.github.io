@@ -383,22 +383,26 @@ st.markdown(st.session_state.summary)
 
 ## 2.3 - News Summarizer Dockerfiles <a name="ex_dockerfiles"></a>
 
-And of course there is the docker compose file and dockerfiles that glues everything together, and actually run things in harmony. First of all, `Docker Compose` file that wraps things together. Here, I am providing `ENV` file so that I do not have to hardcode the port number for FRONT and BACK. In terms of functionality, defining `COMMAND` in Docker Compose and defining it inside Dockerfile, shows no difference. So I am defining backend command to start a backend server in the Docker Compose. 
+And of course there is the docker compose file and dockerfiles that glues everything together, and actually run things in harmony. First of all, `Docker Compose` file that wraps things together. Here, I am providing `ENV` file so that I do not have to hardcode the port number for FRONT and BACK. In terms of functionality, defining `COMMAND` in Docker Compose and defining it inside Dockerfile, shows no difference. So I am defining backend command to start a backend server in the Docker Compose. Health checks are implemented to periodically check the status of the containers, note, there is limitations in terms of self-healing mechanism, which will be addressed in the next post.    
 
 ```bash
-
-# docker compose --env-file=./config.env build
-# docker compose --env-file=./config.env up
-
 # docker-compose.yml
 version: '3.8'
 services:
   backend:
+    env_file:
+      - .env
     build: ./webscrapper
     ports:
-      - ${BACKEND_PORT}:${BACKEND_PORT}
+      - ${BACKEND_PORT}
     volumes:
       - ./webscrapper:/app
+    healthcheck:
+      test: curl --fail http://localhost:${BACKEND_PORT} || exit 1
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
     command: uvicorn main:app --reload --host 0.0.0.0 --port ${BACKEND_PORT}
     networks:
       default:
@@ -406,6 +410,8 @@ services:
             - backend
 
   streamlit-app:
+    env_file:
+      - .env
     build: ./front
     container_name: streamlitapp
     depends_on:
@@ -413,9 +419,21 @@ services:
     ports:
       - ${FRONTEND_PORT}:${FRONTEND_PORT}
     working_dir: /usr/src/app
+    healthcheck:
+      test: curl --fail http://localhost:${BACKEND_PORT} || exit 1 
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+  
 ```
 
-You can see from above that I am defining the backend network alias as `backend`, so that I do not have to hardcode any IP addresses for the frontend to receive the data from the backend. 
+You can see from above that I am defining the backend network alias as `backend`, so that I do not have to hardcode any IP addresses for the frontend to receive the data from the backend. The frontend also depends on the backend. Use `depends_on` to express the startup and shutdown dependencies b/w services. Frontend will always depend on other services being ready. For scaling, you need to make sure that you are not binding yourself to a specific port. Otherwise you will get message saying your port has already been allocated when you try to scale your application like below:
+
+```bash
+docker compose up -d --scale backend=3
+```
+If your ports are set up properly, you can create multiple instances of the backend like below. Again, there are limitations regarding load-balancing regarding this approach, which will be addressed in the next post. 
 
 **Front Dockerfile**
 
@@ -437,9 +455,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # expose port in the environment. 
 EXPOSE ${FRONTEND_PORT} 
-
-# command that is run when container is started
-HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
 ENTRYPOINT ["streamlit", "run", "main.py", "--server.port=8501", "--server.address=0.0.0.0"]
 ```
