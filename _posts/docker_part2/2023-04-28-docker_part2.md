@@ -302,6 +302,11 @@ Okay, finally all the components have been defined. There are quite a bit of det
 <figcaption>Data for our Grafana dashboard will persist, because we generated the volume for it.</figcaption>
 </figure>
 
+<figure>
+<img src="./container_metrics.png" alt="osi">
+<figcaption>Metrics for containers</figcaption>
+</figure>
+
 One thing to note is that source URL pointing at Prometheus (which scraps all the data) must be `http://prometheus:9090`. I tried directing to `http://localhost:9090` and was getting connection error, and it took a while to figure that out. 
 
 
@@ -312,7 +317,7 @@ Awesome, I see some metrics being generated on Grafana, <i>but where are metrics
 Prometheus can collect multiple types of data, and you can find information about them [here](https://prometheus.io/docs/concepts/metric_types/). The Prometheus client libraries offer four core metric types:
 
 1. **Counter**: A counter is a cumulative metric that represents a single monotonically increasing counter whose value can only increase or be reset to zero on restart. For example, you can use a counter to represent the number of requests served, tasks completed, or errors.
-2. **Guage**: A gauge is a metric that represents a single numerical value that can arbitrarily go up and down. Gauges are typically used for measured values like temperatures or current memory usage, but also "counts" that can go up and down, like the number of concurrent requests.
+2. **Gauge**: A gauge is a metric that represents a single numerical value that can arbitrarily go up and down. Gauges are typically used for measured values like temperatures or current memory usage, but also "counts" that can go up and down, like the number of concurrent requests.
 3. **Histogram**: A histogram samples observations (usually things like request durations or response sizes) and counts them in configurable buckets. It also provides a sum of all observed values.
 4. **Histogram**: Similar to a histogram, a summary samples observations (usually things like request durations and response sizes). While it also provides a total count of observations and a sum of all observed values, it calculates configurable quantiles over a sliding time window.
 

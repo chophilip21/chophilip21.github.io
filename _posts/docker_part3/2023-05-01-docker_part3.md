@@ -1,6 +1,6 @@
 ---
 title: Docker part 3 - Going Beyond, Kubernetes
-date: 2023-05-01 03:58:47 +07:00
+date: 2023-04-30 03:58:47 +07:00
 modified: 2023-05-02 16:49:47 +07:00
 tags: [docker, Python, microservice, Kubernetes]
 description: Improving the microservice applications in various ways
