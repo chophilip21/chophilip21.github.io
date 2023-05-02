@@ -290,7 +290,7 @@ node-exporter:
 # 2.0 - Grafana Dashboard <a name="dashboard"></a>
 
 <figure>
-<img src="https://grafana.com/static/assets/img/blog/grafana-security-login-authentication.png" alt="osi">
+<img src="./grafana.png" alt="osi">
 <figcaption>Login, and change your password</figcaption>
 </figure>
 
@@ -364,4 +364,4 @@ In order to use Intrumentator, you need to add middleware to FastAPI application
 <figcaption>If you trigger backend from front couple times, you will see stats being record to Grafana.</figcaption>
 </figure>
 
-Awesome, now we are ready to start looking into Kubernetes on the next post. 
+Awesome, now we are ready to start looking into [Kubernetes on the next post](https://chophilip21.github.io/docker_part3/). 
