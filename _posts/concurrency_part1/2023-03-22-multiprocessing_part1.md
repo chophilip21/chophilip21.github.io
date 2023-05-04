@@ -76,13 +76,140 @@ Now that we have covered the basics, it's time to dive in. In this post, I will 
 <figcaption>Process, Locks, Queues and Pools are the four major pillars of mp. </figcaption>
 </figure>
 
-`Process` is the most basic unit of execution in Python. Every process has its copy of the Python interpreter and its memory space, allowing multiple jobs to get executed simultaneously without conflicts. The multiprocessing.Process instance then provides a Python-based reference to this underlying native process.
+`Process` is the most basic unit of execution in Python. Every process has its copy of the Python interpreter and its memory space, allowing multiple jobs to get executed simultaneously without conflicts. There are two types of processes:
 
+1. `Parent Process`: The main process that can start another child process. 
+2. `Child process`: Process created by another process. Also called subprocess. It can only have one parent process, like how humans can only have one biological paraents. A child process may become orphaned 
+if the parent process gets terminated.
 
+The multiprocessing.Process instance then provides a Python-based reference to this underlying native process. Let's try creating two processes that starts a function that sleeps.
 
+```py
+import time
+import multiprocessing as mp
+
+def sleep(sleep_sec=1):
+    process = mp.current_process()
+    pid = process.pid
+    print(f'process {pid}: Sleeping for {sleep_sec} seconds \n')
+    time.sleep(sleep_sec)
+    print(f'process {pid} Finished sleeping \n')
+
+# create two process
+start_time = time.perf_counter()
+p1 = mp.Process(target=sleep)
+p2 = mp.Process(target=sleep)
+
+# Starts both processes
+p1.start()
+p2.start()
+
+# start both process
+finish_time = time.perf_counter()
+
+# This must be called from the parent process
+if mp.current_process().name == 'MainProcess':
+    print(f"Program finished in {(finish_time - start_time):.3f} seconds")
+```
+
+But if you look at the output, you will notice that it is a bit funny. One would expect print(sleep) and print(finish) to execute first before the final "Program finished" call to be made on the Parent Process. But instead, you get: 
+
+```py
+process 2354: Sleeping for 1 seconds 
+Program finished in 0.006 seconds
+process 2357: Sleeping for 1 seconds 
+process 2354 Finished sleeping 
+process 2357 Finished sleeping
+```
+
+Why is this happening?
+
+<figure>
+<img src="
+https://miro.medium.com/v2/resize:fit:828/format:webp/1*GdzMM5i0nZuN77aqCZO4bQ.png" alt="4 pillars">
+<figcaption>calling join() function explictly blocks and waits for other processes to terminate</figcaption>
+</figure>
+
+Yes, it's because the processes are executed without joining, so the main process that only takes 0.02 seconds to execute finished before waiting for p1 and p2 to finish it's parts. So if you fix this up,
+
+```py
+
+import time
+import multiprocessing as mp
+
+# create two process
+start_time = time.perf_counter()
+
+# save all the process in a list
+processes = []
+
+#create 10 processes that all sleeps
+for i in range(3):
+    p = mp.Process(target=sleep)
+    p.start()
+    processes.append(p)
+
+#join all the process
+for p in processes:
+    p.join()
+
+finish_time = time.perf_counter()
+
+# This must be called from the parent process
+if mp.current_process().name == 'MainProcess':
+    print(f"Program finished in {(finish_time - start_time):.3f} seconds")
+```
+
+And now you properly get:
+
+```py
+process 6950: Sleeping for 1 seconds 
+process 6953: Sleeping for 1 seconds 
+process 6958: Sleeping for 1 seconds 
+process 6950 Finished sleeping 
+process 6953 Finished sleeping 
+process 6958 Finished sleeping 
+Program finished in 1.017 second
+```
+
+Okay, now we understand how Process are started and joined. But one thing to note, is that there are actually 3 different methods for `start`.
+1. `Spawn`: Start a new Python Process
+2. `fork`: Copy a Python process from existing process
+3. `forkserver` : A new process from which future forked processes will be copied. 
+
+You can set specific start method like
+
+```py
+if __name__ == '__main__':
+	# set the start method
+	multiprocessing.set_start_method('spawn')
+```
+
+This isn't too important for now, so further details are not going to be discussed. 
 
 ## 2.2 - Python Multiprocessing: Locks <a name="lock"></a>
+
+Next up is the `Lock`. We learned that process is encapsulated Python program. These processes often share data or resources, and mutual exlcusion lock (Mutex) protects shared resources and prevents race conditions, as race conditions can easily corrupt data and create unwated results. Lock ensures that data is consistent b/w jobs, by preventing another process from accessing the data until the its released. 
+
+Let's look into multiprocessing.Lock class. There are two states: `Locked` and `Unlocked`
+
+```py
+# create a lock
+lock = multiprocessing.Lock()
+# acquire the lock
+lock.acquire()
+# release the lock
+lock.release()
+```
+Lock is more useuful with the queues. So let's discuss queues now.
+
 ## 2.3 - Python Multiprocessing: Queues <a name="queue"></a>
+
+This is the same queue in the context of data structure. But here we are specifically referring to a first-in, first out FIFO queue, in the context of multiprocessing. Data can be placed to a queue, and processed by another processor when it becomes available, allowing us to break up tasks into smaller parts that can be processed simultaneously. 
+
+
+
+
 ## 2.4 - Python Multiprocessing: Pools <a name="pool"></a>
 
 
