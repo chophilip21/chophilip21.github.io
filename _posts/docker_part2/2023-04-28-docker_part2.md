@@ -94,7 +94,7 @@ x-logging:
   options:
     max-size: "1m"
     max-file: "1"
-    tag: "{{.Name}}"
+    tag: "{{Name}}"
 ```
 First of all, a **bridge network** is a Link Layer device which forwards traffic between network segments. A bridge can be a hardware device or a software device running within a host machine’s kernel. Docker Compose understands the idea behind running services for one application on one network. When you deploy an app using Docker Compose file, even when there’s no mention of specific networking parameters, Docker Compose will create a new bridge network and deploy the container over that network. Because they all belong to the same network, all our modules can easily talk to each other. There are other network modes like overlay used for Swarm, but we are mainly interested in bridge.
 Here, a persistent volume for both `Prometheus` and `Grafana` is defined, and also some logging components are initialized. 
