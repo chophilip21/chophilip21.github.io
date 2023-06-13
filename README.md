@@ -1,21 +1,20 @@
-The website is available at this [link](https://chophilip21.github.io/). 
+# Hydejack Starter Kit
 
-This is a repository built with Klise that uses `Jekyll`. 
+A quicker, cleaner way to get started blogging with [Hydejack](https://hydejack.com/).
 
-In order to run the templates, you need to have `Jekyll` [installed with Ruby and Bundler first](https://jekyllrb.com/)
+## Quick Start
+### Running locally
+1. Clone repository (git users), or [download] and unzip.
+2. Open terminal, `cd` into root directory (where `_config.yml` is located)
+3. Run `bundle install` [^1]
+4. Run `bundle exec jekyll serve`
+5. Open <http://localhost:4000/hydejack-starter-kit/>
 
-## Installation
+## What's next?
+* Open files and read the comments
+* Read the [docs](https://hydejack.com/docs/)
+* Buy the [PRO version](https://hydejack.com/download/) to get the project and resume layout, newsletter subscription box, custom forms, and more.
 
-```
-python3 -m venv env
-source env/bin/activate
-pip install -r requirements.txt 
-# pip3 freeze > requirements.txt
-```
+[^1]: Requires Bundler. Install with `gem install bundler`.
 
-Use The make file provided.
-
-```bash
-$ make serve
-```
-
+[download]: https://github.com/hydecorp/hydejack-starter-kit/archive/master.zip

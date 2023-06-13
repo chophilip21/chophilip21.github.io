@@ -20,14 +20,16 @@
 lang:                  en
 
 # The title of your blog. Used in the sidebar and the browser tab.
-title: Philip Cho
+title:                 Hydejack
+
 # A short description (~150 chars) of the page used for the meta description tag.
 # Can use markdown, but no more than one paragraph (enforced by `>`)
 description:           >
-  Machine Learning Engineer, Python specialist, and a soccer player. This is a portfolio website that shows everything I code, study, and love.
+  Hydejack is a boutique Jekyll theme for hackers, nerds, and academics,
+  with a focus on personal sites that are meant to impress.
 
 # A shorter description for the sidebar.
-tagline: Machine Learning Engineer, Python specialist, and a soccer player. This is a portfolio website that shows everything I code, study, and love.
+tagline:               Change `tagline` in `_config.yml`
 
 # A list of keywords for your blog
 keywords:              []
@@ -35,13 +37,13 @@ keywords:              []
 # A (square) logo for your site.
 # If provided, it will be shown at the top of the sidebar.
 # It also used by the `jekyll-seo-tag` plugin.
-logo: ./assets/img/logo.svg
+logo:                  /assets/img/logo.png
 
 # This should be the same author as first entry in `_data/authors.yml`.
 author:
   # Used by `jekyll-feed`:
-  name: Philip Cho
-  email: chophilip21@gmail.com
+  name:                <firstname> <lastname>
+  email:               <mail@domain.tld>
   # # Used by `jekyll-seo-tag`:
   # twitter:             <username>
 
@@ -49,9 +51,9 @@ author:
 menu:
   - title:             Example
     url:               /example/
-  - title:             Documentations
+  - title:             Documentation
     url:               /docs/
-  - title:             About me
+  - title:             About
     url:               /about/
 
 # Add links to the footer.
@@ -78,8 +80,8 @@ paginate_path:         /:num/
 # Theme
 # ---------------------------------------------------------------------------------------
 
-theme: jekyll-theme-hydejack
-# remote_theme: hydecorp/hydejack@v9
+# theme: jekyll-theme-hydejack
+remote_theme: hydecorp/hydejack@v9
 
 
 # Customizaton
@@ -158,7 +160,7 @@ defaults:
         type:          WebPage
 
 kramdown:
-  math_engine:         mathjax
+  math_engine:         katex
   math_engine_opts:    {}
   footnote_backlink:   '&#x21a9;&#xfe0e;'
 
@@ -388,7 +390,6 @@ compress_html:
     envs:              [development]
 
 sass:
-  quiet_deps:                true
   style:               compressed
 
 # Jekyll Compose Defaults
