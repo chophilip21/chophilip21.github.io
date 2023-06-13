@@ -3,13 +3,13 @@
 
 # Uncomment and set the URL of your site (with protocol, e.g. `https://`)
 # NOTE: You don't need to provide this property when hosting on GitHub Pages or Netlify.
-# url:                   https://username.github.io
+url: https://chophilip21.github.io/
 
 # Uncomment and set the "base URL" of your site.
 # When your site is in a subdirectory, set to `/<name of directory>`,
 # with a leading `/` but no trailing `/`. Use the empty string '' otherwise.
 # NOTE: You don't need to provide this property when hosting on GitHub Pages or Netlify.
-# baseurl:               '/hydejack-starter-kit'
+baseurl: ''
 
 
 # General settings
@@ -20,19 +20,19 @@
 lang:                  en
 
 # The title of your blog. Used in the sidebar and the browser tab.
-title:                 Hydejack
+title:                 Philip Cho
 
 # A short description (~150 chars) of the page used for the meta description tag.
 # Can use markdown, but no more than one paragraph (enforced by `>`)
 description:           >
-  Hydejack is a boutique Jekyll theme for hackers, nerds, and academics,
-  with a focus on personal sites that are meant to impress.
+  Philip Cho's personal blog
 
 # A shorter description for the sidebar.
-tagline:               Change `tagline` in `_config.yml`
+tagline: Machine Learning Engineer, Python specialist, and a soccer player. This is a portfolio website that shows everything I code, study, and love.
+
 
 # A list of keywords for your blog
-keywords:              []
+keywords:              [Computer Science, Vancouver, Machine Learning, Computer Vision, Python, AWS]
 
 # A (square) logo for your site.
 # If provided, it will be shown at the top of the sidebar.
@@ -42,8 +42,8 @@ logo:                  /assets/img/logo.png
 # This should be the same author as first entry in `_data/authors.yml`.
 author:
   # Used by `jekyll-feed`:
-  name:                <firstname> <lastname>
-  email:               <mail@domain.tld>
+  name:             Philip Cho
+  email:            chophilip21@gmail.com
   # # Used by `jekyll-seo-tag`:
   # twitter:             <username>
 
@@ -88,7 +88,7 @@ remote_theme: hydecorp/hydejack@v9
 # ----------------------------------------------------------------------------------------
  
 # Sidebar image and theme color of the site.
-accent_image:          /assets/img/sidebar-bg.jpg
+accent_image:          /assets/img/bg.jpg
 accent_color:          rgb(79,177,186)
 
 # This is used for the `theme-color` meta tag,

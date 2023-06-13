@@ -1,4 +1,4 @@
 install:
 	bundle install
 serve:
-	bundle exec jekyll serve --incremental
+	bundle exec jekyll serve
