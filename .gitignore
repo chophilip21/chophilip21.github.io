@@ -53,3 +53,4 @@ _zip
 /assets/js/*hydejack-*
 /_sass/*/__*__/*
 /env
+/old_data
