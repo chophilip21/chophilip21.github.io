@@ -11,7 +11,8 @@ source 'https://rubygems.org'
 # gem "jekyll", "~> 3.9"
 
 group :jekyll_plugins do
-  gem 'github-pages'
+  gem "github-pages", group: :jekyll_plugins
+  gem "jekyll-include-cache", group: :jekyll_plugins
   gem 'jekyll-include-cache'
   gem 'jekyll-compose'
 end
