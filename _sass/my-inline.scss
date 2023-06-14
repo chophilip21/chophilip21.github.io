@@ -61,15 +61,15 @@
 
 .spread-btn {
   background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.5);
+  border: None;
+  color: rgba(243, 0, 0, 0.5);
   cursor: pointer;
   text-align: right;
-  width: 10%;
+  width: 5%;
 }
 
 .spread-btn:hover {
-  color: white;
+  color: rgba(12, 238, 65, 0.25);
 }
 
 input[type=checkbox] {
