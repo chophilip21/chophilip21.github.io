@@ -152,7 +152,7 @@ defaults:
   - scope:
       type:            posts
     values:
-      comments:        true
+      comments:        false
       # https://applause-button.com/
       applause_button:       true
 
@@ -189,9 +189,9 @@ kramdown:
 # google_analytics:      UA-68290006-3
 
 # Set which comment system to use
-comments:
-  # 'disqus' / 'giscus' / 'utterances' are available
-  provider:            giscus
+# comments:
+#   # 'disqus' / 'giscus' / 'utterances' are available
+#   provider:            giscus
 
 # Setting a disqus shortname will enable the comment section on
 # pages with `comments: true` in the front matter.
@@ -209,19 +209,19 @@ comments:
 # You must install giscus github app before use.(https://github.com/apps/giscus)
 # Make sure all variables are set properly. Check below link for detail.
 # https://giscus.vercel.app/
-giscus:
-  repo:                "LazyRen/LazyRen.github.io"
-  repo-id:             "MDEwOlJlcG9zaXRvcnkyNzU4Mjk1NTc="
-  category:            "Comments"
-  category-id:         "DIC_kwDOEHDTNc4B-MIg"
-  mapping:             "pathname"
-  reaction-enabled:    "1"
-  data-emit-metadata:  "0"
-  theme:               "dark_dimmed"
-  data-lang:           "en"
-  crossorigin:         "anonymous"
+# giscus:
+#   repo:                "LazyRen/LazyRen.github.io"
+#   repo-id:             "MDEwOlJlcG9zaXRvcnkyNzU4Mjk1NTc="
+#   category:            "Comments"
+#   category-id:         "DIC_kwDOEHDTNc4B-MIg"
+#   mapping:             "pathname"
+#   reaction-enabled:    "1"
+#   data-emit-metadata:  "0"
+#   theme:               "dark_dimmed"
+#   data-lang:           "en"
+#   crossorigin:         "anonymous"
 
-lightbox:              true
+# lightbox:              true
 
 # Setting a tinyletter username will enable the newsletter subscription box.
 # PRO version only!
@@ -235,11 +235,11 @@ lightbox:              true
 hydejack:
   # Configure the order of complementary content on blog posts
   # post_addons:         [about, newsletter, related, random, comments]
-  post_addons:         [about, comments]
+  post_addons:         [about]
 
   # Configure the order of complementary content on project pages
   # project_addons:      [about, newsletter, other, comments]
-  project_addons:      [about, other, comments]
+  project_addons:      [about, other]
 
   # Set to `true` if you don't want to show an icon indicating external links
   no_mark_external:    true
