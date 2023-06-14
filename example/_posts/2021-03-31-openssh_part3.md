@@ -4,6 +4,9 @@ title: SSH Part3 - Making SSH connections more secure using VPN
 description: Understanding how SSH works
 sitemap: false
 hide_last_modified: true
+related_posts:
+    - example/_posts/2021-06-01-network_part1.md
+    - example/_posts/2021-03-19-openssh_part2.md
 ---
 
 * toc

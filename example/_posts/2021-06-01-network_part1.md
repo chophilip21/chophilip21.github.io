@@ -4,6 +4,9 @@ title: Networking part 1 - Networking Top Down Approach
 description: Basics of networking
 sitemap: false
 hide_last_modified: true
+related_posts:
+    - example/_posts/2021-03-19-openssh_part2.md
+    - example/_posts/2021-03-31-openssh_part3.md
 ---
 
 * toc

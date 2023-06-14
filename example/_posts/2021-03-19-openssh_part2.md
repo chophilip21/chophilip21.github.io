@@ -5,7 +5,9 @@ description: Understanding how SSH works in depth
 sitemap: false
 hide_last_modified: true
 categories: [openssh, SSH, networking]
-
+related_posts:
+    - example/_posts/2021-06-01-network_part1.md
+    - example/_posts/2021-03-31-openssh_part3.md
 ---
 
 * toc
