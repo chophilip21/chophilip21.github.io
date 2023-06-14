@@ -3,7 +3,7 @@ layout: tag-list
 type: tag
 title: Rust
 slug: rust
-category: studylog
+category: programming
 sidebar: true
 description: >
    Rust related posts

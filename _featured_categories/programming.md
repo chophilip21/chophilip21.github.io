@@ -1,10 +1,10 @@
 ---
 layout: list
 type: category
-title: Study Log
-slug: studylog
+title: Programming
+slug: programming
 sidebar: true
 order: 3
 description: >
-  Log study results
+  Anything about Programming
 ---

@@ -36,15 +36,17 @@
   margin: 0 0 4px 0;
 }
 
+//main items orientation
 .list-wrapper {
-  text-align: left;
+  text-align: center;
   width: 18rem;
   display: flex;
 }
 
+//subitems orientation
 .list-body {
   margin: 0;
-  text-align: left;
+  text-align: right;
 }
 
 .sidebar-about {
@@ -63,7 +65,7 @@
   color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
   text-align: right;
-  width: 100%;
+  width: 10%;
 }
 
 .spread-btn:hover {

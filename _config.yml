@@ -476,6 +476,5 @@ jekyll_compose:
 # jekyll-feed settings
 feed:
   categories:
-    - devlog
-    - review
-    - studylog
+    - ml
+    - programming

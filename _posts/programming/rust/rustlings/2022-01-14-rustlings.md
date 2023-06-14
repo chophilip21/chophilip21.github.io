@@ -2,7 +2,7 @@
 layout:   post
 title:    "Rustlings Solution"
 subtitle: "Rustlings Solution"
-category: studylog
+category: programming
 tags:     rust rustlings
 image:
   path:   /assets/img/ferris/flat-gesture.svg
