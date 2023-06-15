@@ -1,11 +1,13 @@
 ---
+layout: post
 title: Python Concurrency Part 1 - Multiprocesing
-date: 2022-03-22 15:00:00 +07:00
-tags: python
 description: Note for parallel processing
+tags: python
 usemathjax: true
 ---
 
+* toc
+{:toc .large-only}
 
 ## Why is Pyhon so slow?
  
@@ -54,7 +56,7 @@ First of all, **threading is a great way to speed up application to tackle I/O b
 This is why we have `Multi-processors`. When the program is CPU intensive and doesn’t have to do any IO or user interaction, you can use multiprocessors to exponentially speed up the computation by breaking down the problem into chunks, and delegating each cores to handle the chunks. More processes can be created if your computer has more cores. It becomes less scalable when your spin up more processes than the number of cores in your computer. 
 
 
-# Python Multiprocessing: Process
+# Python Multiprocessing
 
 Now that we have covered the basics, it's time to dive in. In this post, I will cover [multiprocessing library](https://docs.python.org/3/library/multiprocessing.html), which is the core Python modules for multiprocessing. I have already used multiprocessing to some extent for work (for database migration), so it would be easier to start from something that I am familiar with. Multiprocessing library offers four major parts: 
 1. Process 
@@ -66,6 +68,8 @@ Now that we have covered the basics, it's time to dive in. In this post, I will 
 <img src="https://cdn.educba.com/academy/wp-content/uploads/2020/02/Python-Multiprocessing-2.jpg" alt="4 pillars">
 <figcaption>Process, Locks, Queues and Pools are the four major pillars of mp. </figcaption>
 </figure>
+
+##  Process
 
 `Process` is the most basic unit of execution in Python. Every process has its copy of the Python interpreter and its memory space, allowing multiple jobs to get executed simultaneously without conflicts. There are two types of processes:
 
@@ -194,7 +198,7 @@ lock.release()
 ```
 Lock is more useuful with the queues. So let's discuss queues now.
 
-## Queues >
+## Queues
 
 This is the same queue in the context of data structure. But here we are specifically referring to a first-in, first out FIFO queue, in the context of multiprocessing. Data can be placed to a queue, and processed by another processor when it becomes available, allowing us to break up tasks into smaller parts that can be processed simultaneously. 
 

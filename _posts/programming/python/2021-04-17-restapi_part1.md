@@ -1,10 +1,13 @@
 ---
+layout: post
 title: Rest API Part 1 - Building basic examples
-date: 2021-04-17 15:44:47 +07:00
 tags: python
 description: Basics of Rest API using Python 
 usemathjax: true
 ---
+
+* toc
+{:toc .large-only}
 
 # REST (protocol vs architecture)
 <figure>
