@@ -1,10 +1,10 @@
 ---
 layout: tag-list
 type: tag
-title: C++
-slug: cpp
+title: C++/Rust
+slug: cpp/rust
 category: programming
 sidebar: true
 description: >
-   C++ related posts
+   C++ and Rust related posts (Low level languages)
 ---
