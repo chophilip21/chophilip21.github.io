@@ -1,6 +1,6 @@
 ---
 layout: welcome
-title: Everything About me
+title: About me
 permalink: /about/
 more_posts: posts.md
 sidebar: true

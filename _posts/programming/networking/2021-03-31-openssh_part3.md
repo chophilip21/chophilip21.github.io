@@ -170,7 +170,7 @@ Pi-Hole is an advert-blocking application aimed at blocking ads at the network l
 The installation instructions change time to time, so it's best to check out the [official page](https://github.com/pi-hole/pi-hole/#one-step-automated-install). Installation should be easy. 
 
 <figure>
-<img src="./upstream_provider.png" alt="vpn/ssh">
+<img src="/assets/img/2021-03-31/upstream_provider.png" alt="vpn/ssh">
 <figcaption>You can set upstream provider to anything for now. This will change later on.</figcaption>
 </figure>
 
@@ -255,7 +255,7 @@ After logging back into Pi-hole admin page, we need to congire DNS Server settin
 Now you will see this in the interface settings.The Upgstream DNS servers will be identical to Unbound configuration, so `127.0.0.1#5353`
 
 <figure>
-<img src="./dns_pihole.png" alt="vpn/ssh">
+<img src="/assets/img/2021-03-31/dns_pihole.png" alt="vpn/ssh">
 <figcaption>There many ways to configure DNS settings, but do I you really need to go for potentially dangerous options?</figcaption>
 </figure>
 
@@ -318,7 +318,7 @@ Funny thing about many tutorials out there on the internet, is that they do not 
 With the config file we got from the server, activating should be dead easy. **BUT you may experience errors, where you can connect VPN, but cannot access the internet**. Do not worry, there is an easy way to automatically fix this via PiVPN. Kudos to their team. 
 
 <figure>
-<img src="./pivpn-d.png" alt="vpn/ssh">
+<img src="/assets/img/2021-03-31/pivpn-d.png" alt="vpn/ssh">
 <figcaption>PiVPN saves your life by fixing things up for you while running debugging command.</figcaption>
 </figure>
 
