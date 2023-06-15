@@ -40,7 +40,7 @@ In client-server architecture, a client would not directly interact with another
 Applications on either server or client is referred to as `processes`, and each processes have communication sockets (interface) that acts as a bridge b/w Application layer and Transport layer. 
 
 <figure>
-<img src="./sockets.png" alt="texbook">
+<img src="/assets/img/2021-06-01/sockets.png" alt="texbook">
 <figcaption>Application processes, sockets, and transport protocol</figcaption>
 </figure>
 
@@ -62,7 +62,7 @@ Each transport protocol has its own pros and cons. For example, there is `Transm
 
 
 <figure>
-<img src="./tcp_vs_udp.png" alt="textbook">
+<img src="/assets/img/2021-06-01/tcp_vs_udp.png" alt="textbook">
 <figcaption>requirement of selected network applications</figcaption>
 </figure>
 
@@ -156,7 +156,7 @@ However, websites need to be able to identify who the user is even if it's state
 And there is the concept of **Caching**. Requests for images and other heavier data is expensive. If the data have to be fetched from server (or client) again everytime, it would be very inefficient, so there is the middle proxy server (typically inside the client's computer) that acts as a temporary storage. 
 
 <figure>
-<img src="./caching.png" alt="http">
+<img src="/assets/img/2021-06-01/caching.png" alt="http">
 <figcaption>Caching speeds up loading time</figcaption>
 </figure>
 
@@ -247,7 +247,7 @@ Similar to how HTTP requests/responses are formatted, DNS requests and responses
 
 
 <figure>
-<img src="./dns.png" alt="dns">
+<img src="/assets/img/2021-06-01/dns.png" alt="dns">
 <figcaption>DNS message format</figcaption>
 </figure>
 

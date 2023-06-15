@@ -1,8 +1,7 @@
 ---
 title: Rest API Part 1 - Building basic examples
-date: 2023-04-17 15:44:47 +07:00
-modified: 2023-04-17 16:49:47 +07:00
-tags: [python, restapi]
+date: 2021-04-17 15:44:47 +07:00
+tags: python
 description: Basics of Rest API using Python 
 usemathjax: true
 ---
@@ -13,7 +12,7 @@ usemathjax: true
 <figcaption>OSI models can be interpreted in both directions, depending on who you are (sender vs receiver) </figcaption>
 </figure>
 
-OSI model explains concepts related to computer systems communicating over network. **A communication protocol is a system of rules (contract) that allows two or more entities of a communications system to transmit information via any kind of variation of a physical quantity. An architecture is how to best organize these protocols to create an efficient application.** REST (REpresentational State Transfer) is an architecture style (concept, not a contract), so it does not technically belong to OSI model according to the author. You can say it's imaginary layer 8 talking to layer 7. In application development, the only protocol that really belongs to the OSI application layer is HTTP protocol. But, you can picture everything like this:
+The well known seven layers of OSI model explain the concepts related to computer systems communicating over network. **A communication protocol is a system of rules (contract) that allows two or more entities of a communications system to transmit information via any kind of variation of a physical quantity. An architecture is how to best organize these protocols to create an efficient application.** REST (REpresentational State Transfer) is an architecture style (concept, not a contract), so it does not technically belong to OSI model. You can say it's imaginary layer 8 talking to layer 7. In application development, the only protocol that really belongs to the OSI application layer is HTTP protocol. But, you can picture everything like this:
 
 - REST (Architecture, say layer 8.)
 - HTTP (protocol. Layer 7.)
@@ -334,7 +333,7 @@ Fairly straight forward! Instead of providing the entire JSON body, if you can p
 
 
 <figure>
-<img src="./complete.png" alt="osi">
+<img src="/assets/img/2021-04-17/complete.png" alt="osi">
 <figcaption>Fast API Swagger dashboard should look like this.</figcaption>
 </figure>
 
