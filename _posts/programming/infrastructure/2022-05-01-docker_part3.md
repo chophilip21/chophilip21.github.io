@@ -2,7 +2,7 @@
 layout: post
 title: Docker part 3 - Going Beyond, Kubernetes
 tags: infrastructure
-description: Improving the microservice applications in various ways
+description: Improving the microservice applications using Kubernetes
 ---
 
 * toc
