@@ -4,7 +4,6 @@ title: Networking part 3 - Network layers
 tags: networking
 description: Basics of networking III
 subtitle: Basics of networking III
-usemathjax: true
 ---
 
 * toc

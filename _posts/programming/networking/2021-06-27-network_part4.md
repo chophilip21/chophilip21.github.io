@@ -4,7 +4,6 @@ title: Networking part 4 - Link/Physical layers
 tags: networking
 description: Basics of networking IV
 subtitle: Basics of networking IV
-usemathjax: true
 ---
 
 * toc
