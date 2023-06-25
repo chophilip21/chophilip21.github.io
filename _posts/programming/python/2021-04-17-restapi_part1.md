@@ -3,7 +3,6 @@ layout: post
 title: Rest API Part 1 - Building basic examples
 tags: python
 description: Basics of Rest API using Python 
-usemathjax: true
 ---
 
 * toc

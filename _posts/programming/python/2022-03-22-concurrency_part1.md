@@ -3,7 +3,6 @@ layout: post
 title: Python Concurrency Part 1 - Multiprocesing
 description: Note for parallel processing
 tags: python
-usemathjax: true
 ---
 
 * toc
