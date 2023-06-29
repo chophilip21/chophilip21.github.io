@@ -88,24 +88,14 @@ I feel like it would only make sense for me to look into IQA and NDD closely aft
 # Lifelong Learning (LL)
 
 If you think about how humans learn, We always retain the knowledge learned in the past and use it to help future learning and problem solving. When faced with a new problem or a new environment, we can adapt our past knowledge to deal with the new situation and also learn from it. The author of [Lifelong Machine Learning](https://www.cs.uic.edu/~liub/lifelong-machine-learning.html) defines the process to imitate this human learning process and
-capability as `Lifelong learning (LL)`. He lays out these criteria for LL:
-
-- (a) continuous learning process,
-- (b) knowledge accumulation and maintenance in the KB,
-- (c) the ability to use the accumulated past knowledge to help future learning,
-- (d) the ability to discover new tasks, and
-- (e) the ability to learn while working or to learn on the job.
-
-According to his definition, terms like `Online learning` and `continual learning` are subsets of LL. But what I noticed from research is that the boundary of these expressions are extremely fuzzy, and many papers and articles mix these terms up. So I am referring to a definition that sounded most clear to me. 
+capability as `Lifelong learning (LL)`, and states terms like `Online learning` and `continual learning` are subsets of LL. 
 
 ## Online Learning overview 
 
-What is Online Learning? Online learning (OL), is a learning paradigm where the training data points arrive in a sequential
-order. When a new data point arrives, the existing model is quickly updated to produce the best
-model so far. In online learning, if whenever a new data point arrives re-training using all the available
-data is performed, it will be too expensive. Furthermore, during re-training, the model being
-used is already out of date. Thus, online learning methods are typically memory and run-time
-efficient due to the latency requirement in a real-world scenario.
+What is Online Learning exactly? Online learning (OL), is a learning paradigm where the training data points arrive in a sequential order. This could be because the entire data is not available yet, due to various reasons like annotations being too expensive, or for cases like us, where we need the users to generate these data. 
+
+When a new data point arrives, the existing model is quickly updated to produce the best
+model so far. In online learning, if whenever a new data point arrives re-training using all the available data is performed, it will be too expensive. It becomes impossible when the model size is big. Furthermore, during re-training, the model being used could already out of date. Thus, online learning methods are typically memory and run-time efficient due to the latency requirement in a real-world scenario.
 
 Much of the online learning research focuses on one domain/task. <b>Objective is to learn more efficiently with the data arriving incrementally. LL, on the other hand,
 aims to learn from a sequence of different tasks, retain the knowledge learned so far, and use the knowledge to help future task learning. Online learning does not do any of these</b>
@@ -113,21 +103,91 @@ aims to learn from a sequence of different tasks, retain the knowledge learned s
 
 ## Continual learning overview
 
-Continual learning is also a subset of LL. But it turns out that I have been perceiving the terms are actually incorrect.
+The concept of OL is simple. The sequence of data gets unlocked in every stage, and the training is performed sequentially to make model more robust. Continual learning is also quite similar, but it is more [sophisticated](https://www.nature.com/articles/s42256-022-00568-3). It needs to learn various new tasks incrementally while sharing paramters with old ones, without forgetting.
+
+Continuous learning is generally divided into three categories:
 
 <figure>
 <img src="assets/img/2023-06-25/scenarios.png" alt="osi">
-<figcaption> In CL, there are three possible scenarios. For more info, refer to </figcaption>
+<figcaption> In CL, there are three possible scenarios. It's very important to understand the distinction</figcaption>
 </figure>
 
-The concept of OL is simple. The sequence of data gets unlocked in every stage, and the training is performed sequentially to make model more robust. Continual learning, however, is much more sophisticated, as number of tasks are increasing, the domain shifts completely, and number of classes change from training round `T` to `T+1` to `T+n`. 
 
-Above is not what we are intending to do, as number of labels of IQA will not increase or decrease, and data will be all similar type of portrait photography. We won't ask the model to perform a new type of tasks, such as doing instance segmentation on the images. <b>There is little doubt that we need to look for online learning algorithms </b> 
+### Task Incremental learning 
+
+Let's look at the first scenario. This scenario is best described as the case where
+an algorithm must incrementally learn a set of distinct tasks. Often times, this task identity is explicit, and it does not require seperate network. **If the network requires completely different task** (e.g Classification vs Object Detection), it would require seperate network and weights, **And there will be no forgetting at all** 
+
+The challenge with task-incremental learning, therefore, is not—or should not be—to simply prevent catastrophic forgetting, but rather to <b>find effective ways to share learned representations across tasks, to optimize the trade-off between performance and computational
+complexity and to use information learned in one task to improve performance on other tasks</b>
+
+Now assume this scenario for MNIST:
+
+<figure>
+<img src="assets/img/2023-06-25/tasks.png" alt="osi">
+<figcaption> Each task here is to to binary classification of two digits, using the same network structure.</figcaption>
+</figure>
+
+So the objective here would be to ensure that learning `Task N` would make learning of `Task N+1` easier, and for above example, even after learning all the way up to Task 5, when we ask to perform classification for Task 1, the model can still perform well without forgetting. 
+
+Thus when we have some Input space `X` and output space `Y`, with the task context `C`, we learn to perform 
+
+$$
+f : X \times C \rightarrow Y 
+$$
+
+### Domain Incremental learning 
+
+In this scenario, the structure of the problem is always the same, but the context or input-distribution changes.
+
+<figure>
+<img src="assets/img/2023-06-25/task_id.png" alt="osi">
+<figcaption> Domain Incremental Learning is Task-Incremental learning without task information. </figcaption>
+</figure>
+
+It is similar to Task incremental learning in that every training round n, we expect the model to learn from Dataset n:
+
+$$
+D_n = {(x_i, y_i)}
+$$
+
+But at the test time, we do not know which "task" it came from. This is probably the most relevant cases for our pipeline. The available labels (classes) will remain the same, and domain will keep on changing. We do not care or want to provide task context. Thus intuitively, this is:
+
+$$
+f : X \rightarrow Y 
+$$
+
+### Class Incremental learning 
+
+The final scenario is the class incremental learning. This is more popular field of study within continual learning, and most continual learning papers at CVPR were targeted for class incremental learning as well, because this is the area where often times the catastrophic forgetting (CF) happens most significantly. This scenario is best described as the case where an algorithm must incrementally learn to discriminate between a growing number of objects or classes. 
+
+Data arrives incrementally as a batch of per-class sets X i.e. ($$X$$, $$X^2$$, ..., $$X^t$$
+), where $$X^y$$ contains all images from class y. Each round of learning from one batch of classes is considered Task $$T$$. At each step $$T$$, complete data is only available for new classes $$X$$, and the only small number previously learned classes are available as memory buffer. If not using rehearsal technique, the memory buffer is not even available. The algorithm must map out global label space, and at testing time, it would not have any idea of which step the data came from.  
+
+<figure>
+<img src="assets/img/2023-06-25/contexts.png" alt="osi">
+<figcaption> Expected input and output. In many practical applications,
+the data will arrive in a more mixed-up fashion. </figcaption>
+</figure>
+
+And this is out of scope of this research. Why? 
+
+The new data that users will be adding over time will span across multiple classes, and a lot of them will be from previously seen classes. The strict protocol of class-incremental learning would not make sense. 
+
+### Single head vs Multi-head evaluation
+
+The system should be able to differentiate the tasks and achieve successful intertask classification without the prior knowledge of the task identifier (i.e. which task current data belongs to). In the case of `single-head`, the neural network output should consist of all the classes seen so far, so the output should be evaluated in the global scale. In contrast, `multi-head` evaluation only deals with intra-task classification where the network output only consists of a subset of all the classes.
+
+For MNIST, say that the dataset is broken down by classes into 5 tasks, where we have `[{0,1}....{8,9}]`
+
+In `multi-head` setting, we would know the ask number (let's say Task 5), and we would only be making prediction b/w the subset {8,9}. Typically Task-incremental learning will fall under this.
+
+In `single-head` setting, evaluation will be down across all ten classes, so {0...9}. Typically domain incremental and class incremental learning will fall under this.  
 
 
-# Types of Online learning algorithm
+# Types of OL/CL algorithm
 
-My conclusion is that although some authors make clear distinctions b/w `Online learning` and `Continual Learning`, some papers like [this](https://arxiv.org/pdf/2206.11849v1.pdf) uses terms like `Online Continual Learning`, combining two concepts into one. So there is no real meaning of discarding a paper because it says `Continuous learning` in the title, and the only way you can tell if a paper is suitable for your needs, is to actually skim through the paper itself. Regardless of being OL or CL, these properties are shared:
+My conclusion after research is that although some authors make clear distinctions b/w `Life long learning`, `Online learning` and `Continual Learning` as most use them interchaneably.   Regardless of being OL or CL, these properties are shared:
 
 1. Online model parameter adaptation: How to update
 the model parameters with the new data?
@@ -142,6 +202,12 @@ The presence of concept drift or introducing a new class
 of data might necessitate updating and increasing model
 complexity against limited system resources
 
+
+<figure>
+<img src="https://www.researchgate.net/publication/338872650/figure/fig1/AS:852486734766082@1580260084945/The-stability-plasticity-dilemma-in-unsupervised-clustering-Lifelong-learning-is.png" alt="osi">
+<figcaption> Catastrophic forgetting is the biggest chanllenge to solve.</figcaption>
+</figure>
+
 So the main challenge, as everyone agrees, is to make model plastic enough to learn due data, but stable enough to not forget the previously gained knowledge. Finding this balance is the key to online learning. Now we look at some of the methods.
 
 ## Replay methods
@@ -153,6 +219,10 @@ The main differences b/w replay methods exists in the following:
 - How examples are picked and stored
 - How examples are replayed
 - How examples update the weights 
+
+**Drawbacks**
+
+The storage cost would go up linearly with the tasks. Yes, we are sampling from older data, but as round progresses, the storage of older data would be required to increase.  
 
 **Relevant papers**
 
@@ -192,6 +262,17 @@ Originally designed to transfer the learned knowledge of larger network (teacher
 **CVPR**
 
 - [Online Distillation with Continual Learning for Cyclic Domain Shifts](https://drive.google.com/file/d/1ap2EBLk365gfiKgUMwgrQkdNMDAf2N_S/view)
+
+<!-- 
+## Evaluating the algorithms
+
+Despite its scope, continual learning research is relatively unstructured and the field lacks a shared framework. Because of an subtle differences between evaluation protocols, systematic comparison between continual learning algorithms is challenging, even when papers use the same datasets. Therefore, there are many papers claiming to be state-of-the-art, but we need to pay attention to what they are claiming because it could be the case where authors are not comparing apples to apples. But following are some of the commons ways: -->
+
+
+# Learning without Forgetting
+
+Now that we have some general idea of how incremental learning works, let's look at a paper in depth. [Learning without Forgetting](https://arxiv.org/pdf/1606.09282.pdf) released in 2017 is probably one of the earliest and most famous work done in this field. This may not be perfectly suitable for our scenario where label space b/w previous task overlaps and may or may not contain novel class, but it is still important in the sense that you can understand general mechanism. 
+
 
 # SequeL
 
