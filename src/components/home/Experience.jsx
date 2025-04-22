@@ -17,7 +17,7 @@ const Experience = ({ experiences }) => {
           <Row>
             {
               experiences.data.map((data, index) => {
-                return <ExperienceCard key={index} data={data} />
+                return <ExperienceCard key={index} data={data} imageSize={experiences.imageSize} />
               })
             }
           </Row>

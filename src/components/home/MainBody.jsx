@@ -60,6 +60,7 @@ const MainBody = React.forwardRef(
           </div>
           <a
             className="btn btn-outline-light btn-lg shadow border border-light"
+            style={{ fontFamily: 'HelveticaNeueHeavy, sans-serif' }}
             href="#aboutme"
             role="button"
             aria-label="Learn more about me"
