@@ -12,7 +12,7 @@
     <meta name="theme-color" content="#000000" />
     <meta
       name="description"
-      content="My name is Hashir Shoaib. I’m a graduate of 2020 from National University of Sciences and Technology at Islamabad with a degree in Computer Engineering. I'm most passionate about giving back to the community, and my goal is to pursue this passion within the field of software engineering. In my free time I like working on open source projects."
+      content="My name is Philip Cho. I’m a graduate of 2020 from National University of Sciences and Technology at Islamabad with a degree in Computer Engineering. I'm most passionate about giving back to the community, and my goal is to pursue this passion within the field of software engineering. In my free time I like working on open source projects."
     />
     <link rel="apple-touch-icon" href="logo192.png" />
     <!--
@@ -31,7 +31,31 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>Hashir Shoaib</title>
+    <link rel="preload" href="%PUBLIC_URL%/fonts/HelveticaNeue-Heavy.woff" as="font" type="font/woff" crossorigin />
+    <link rel="preload" href="%PUBLIC_URL%/fonts/HelveticaNeue-Extended.woff" as="font" type="font/woff" crossorigin />
+    <style>
+      @font-face {
+        font-family: 'HelveticaNeueHeavy';
+        src: url('%PUBLIC_URL%/fonts/HelveticaNeue-Heavy.woff') format('woff');
+        font-weight: 800;
+        font-style: normal;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: 'HelveticaNeueExtended';
+        src: url('%PUBLIC_URL%/fonts/HelveticaNeue-Extended.woff') format('woff');
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+      h1.display-1 {
+        font-family: 'HelveticaNeueExtended', sans-serif;
+      }
+      .lead.typist {
+        font-family: 'HelveticaNeueHeavy', sans-serif;
+      }
+    </style>
+    <title>Philip Cho</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
