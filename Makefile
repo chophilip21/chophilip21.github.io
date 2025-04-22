@@ -4,4 +4,4 @@ serve:
 	bundle exec jekyll serve
 venv:
 	conda install virtualenv
-	python3.9 -m venv env
+	python3.11 -m venv env
