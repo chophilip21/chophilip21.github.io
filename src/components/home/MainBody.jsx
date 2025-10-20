@@ -61,11 +61,13 @@ const MainBody = React.forwardRef(
           <a
             className="btn btn-outline-light btn-lg shadow border border-light"
             style={{ fontFamily: 'HelveticaNeueHeavy, sans-serif' }}
-            href="#aboutme"
+            href={`${process.env.PUBLIC_URL}/resume.pdf`}
+            target="_blank"
+            rel="noopener noreferrer"
             role="button"
-            aria-label="Learn more about me"
+            aria-label="View Resume"
           >
-            More about me
+            Resume
           </a>
         </Container>
       </Jumbotron>

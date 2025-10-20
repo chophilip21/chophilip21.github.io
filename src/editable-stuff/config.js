@@ -28,10 +28,13 @@ const about = {
   imageLink: require("../editable-stuff/me.jpg"),
   imageSize: 375,
   message:
-    "Hello there, welcome to my website! I'm Philip and I am a machine learning (ML) engineer and a software developer living in Vancouver, Canada. " + 
-    "I graduated from Simon Fraser University (SFU) in 2021 with Masters Degree in Visual Computing and a Bachelors in Commerce from University of British Columbia (UBC) in 2016. " +
-    "I've been working in the ML industry since 2021, specialized in Computer Vision. I am passionate about building ML based applications that solve real world problems. " +
-    "If you are interested in learning more about me or my past work, checkout my resume below and feel free to get in touch with me.",
+    "Thanks a lot for visiting my website 👍 My name is Philip and I am a machine learning (ML) engineer and a software developer living in Vancouver, Canada.<br><br>" + 
+    "Let me tell you a bit about myself. My journey into tech wasn’t a straight path. After graduating from the Sauder School of Business at UBC in 2016, I began my career as a marketing specialist at a SaaS company. " + 
+    "It was a great start — but over time, I discovered myself drawn to something more technical, finding solving technical problems extremely rewarding."+ 
+    " Back then, AI and machine learning weren’t nearly as mainstream as they are today, just starting to bloom. But that futuristic edge — the idea that machines could perceive, reason, and improve — completely fascinated me."+ 
+    " Eventually, I decided to follow that spark, leaving my marketing role to pursue a new direction in computer science and machine learning. It was a bumpy road, but in 2021, I successfully completed my Master’s degree in Computer Science at Simon Fraser University (SFU), specializing in Visual Computing. <br><br>" +
+    "Since then, I’ve been working in the machine learning industry, focusing on computer vision. I’m passionate about researching ML algorithms, and building ML-powered applications that bridge research and reality — solving real-world problems with data, algorithms, and a bit of creativity. <br><br>" +
+    "If you are interested in learning more about me or my past work, checkout my resume from above and feel free to get in touch with me.",
   resume: "https://docs.google.com/document/d/13_PWdhThMr6roxb-UFiJj4YAFOj8e_bv3Vx9UHQdyBQ/edit?usp=sharing",
 };
 
