@@ -7,7 +7,7 @@ const navBar = {
 const mainBody = {
   gradientColors: "#4484ce, #1ad7c0, #ff9b11, #9b59b6, #ff7f7f, #ecf0f1",
   firstName: "Philip",
-  middleName: "yunsoo",
+  middleName: "Yunsoo",
   lastName: "Cho",
   message: " ML Engineer, Software Developer, and a Soccer Player ",
   icons: [
@@ -28,9 +28,9 @@ const about = {
   imageLink: require("../editable-stuff/me.jpg"),
   imageSize: 375,
   message:
-    "Thanks a lot for visiting my website 👍 My name is Philip and I am a machine learning (ML) engineer and a software developer living in Vancouver, Canada.<br><br>" + 
-    "Let me tell you a bit about myself. My journey into tech wasn’t a straight path. After graduating from the Sauder School of Business at UBC in 2016, I began my career as a marketing specialist at a SaaS company. " + 
-    "It was a great start — but over time, I discovered myself drawn to something more technical, finding solving technical problems extremely rewarding."+ 
+    "Hello! Thanks a lot for visiting my website 👍 My name is Philip and I am a machine learning (ML) engineer and a software developer living in Vancouver, Canada. Since you are here, let me tell you a bit about my story, stuff that I don't have on my resume.<br><br>" + 
+    "My journey into tech wasn’t a straight path. After graduating from the Sauder School of Business at UBC in 2016, I actually began my career as a marketing specialist at a SaaS company. " + 
+    "It was not a bad start — but over time, I discovered myself drawn to something more technical. Finding solutions to technical problems were extremely rewarding to me, more than anything else."+ 
     " Back then, AI and machine learning weren’t nearly as mainstream as they are today, just starting to bloom. But that futuristic edge — the idea that machines could perceive, reason, and improve — completely fascinated me."+ 
     " Eventually, I decided to follow that spark, leaving my marketing role to pursue a new direction in computer science and machine learning. It was a bumpy road, but in 2021, I successfully completed my Master’s degree in Computer Science at Simon Fraser University (SFU), specializing in Visual Computing. <br><br>" +
     "Since then, I’ve been working in the machine learning industry, focusing on computer vision. I’m passionate about researching ML algorithms, and building ML-powered applications that bridge research and reality — solving real-world problems with data, algorithms, and a bit of creativity. <br><br>" +
