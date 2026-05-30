@@ -10,7 +10,7 @@ const pictureLinkRegex = new RegExp(
 const AboutMe = ({ heading, message, link, imgSize, resume }) => {
   const [profilePicUrl, setProfilePicUrl] = React.useState("");
   const [showPic, setShowPic] = React.useState(Boolean(link));
-  // https://stackoverflow.com/questions/55840294/how-to-fix-missing-dependency-warning-when-using-useeffect-react-hook
+
   React.useEffect(() => {
     const handleRequest = async () => {
       const instaLink = "https://www.instagram.com/";
@@ -31,26 +31,25 @@ const AboutMe = ({ heading, message, link, imgSize, resume }) => {
     }
   }, [link]);
 
-
-
   return (
-    <Jumbotron id="aboutme" className="m-0">
-      <div className="container row">
-        <div className="col-5 d-none d-lg-block align-self-center">
-          {showPic && (
+    <Jumbotron id="aboutme" className="m-0 section-block section-about about-me-section">
+      <div className="container">
+        <h2 className="display-4 text-center about-me-heading">{heading}</h2>
+        {showPic && (
+          <div className="text-center about-me-photo-wrap">
             <img
-              className="border border-secondary rounded-circle"
+              className="about-me-photo border border-secondary rounded-circle"
               src={profilePicUrl}
-              alt="profilepicture"
+              alt="Philip Cho"
               width={imgSize}
               height={imgSize}
             />
-          )}
-        </div>
-        <div className={`col-lg-${showPic ? "7" : "12"}`}>
-          <h2 className="display-4 mb-5 text-center">{heading}</h2>
-          <p className="lead text-center" dangerouslySetInnerHTML={{ __html: message }}></p>
-        </div>
+          </div>
+        )}
+        <div
+          className="about-me-body"
+          dangerouslySetInnerHTML={{ __html: message }}
+        />
       </div>
     </Jumbotron>
   );

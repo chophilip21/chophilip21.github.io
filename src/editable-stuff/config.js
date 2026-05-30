@@ -9,7 +9,7 @@ const mainBody = {
   firstName: "Philip",
   middleName: "Yunsoo",
   lastName: "Cho",
-  message: " ML Engineer, Software Developer, and a Soccer Player ",
+  message: " ML Engineer, Software Developer, and a Creator of SotaVault ",
   icons: [
     {
       image: "fa-github",
@@ -22,19 +22,43 @@ const mainBody = {
   ],
 };
 
+const sotaVault = {
+  show: true,
+  heading: "Founder of SotaVault",
+  logoSrc: process.env.PUBLIC_URL + "/sotavault.svg",
+  websiteUrl: "https://sotavault.ai/",
+  description:
+    "SotaVault helps the ML community discover conferences, research papers, dataset series, and benchmark leaderboards in one place. The platform curates and structures benchmark metadata extracted through custom ingestion and language-model pipelines — while respecting that underlying papers and public datasets remain the property of their original authors.",
+  highlights: [
+    "Built and launched a full-scale automated machine learning benchmark and leaderboard platform from scratch, owning the product architecture and lifecycle from data ingestion to production cloud deployment.",
+    "Designed cloud-native infrastructure on Google Kubernetes Engine (GKE) with Terraform, including horizontal pod autoscaling for fluctuating user traffic, Redis for API caching, and a GitHub Actions CI/CD pipeline that tests, packages images to Artifact Registry, and finally deploys through Cloud Deploy.",
+    "Developed an automated arXiv ingestion pipeline, first using OCR models to collect metadata and processing key metrics using AWQ/GGUF quantized vLLM models, finally cross checking the quality of the data using web-grounded LLM agents and internal vector DB.",
+    "Architected low-latency semantic search and discovery APIs backed by the internal vector database for benchmark and paper exploration.",
+  ],
+};
+
 const about = {
   show: true,
   heading: "About Me",
   imageLink: require("../editable-stuff/me.jpg"),
-  imageSize: 375,
+  imageSize: 176,
   message:
-    "Hello! Thanks a lot for visiting my website 👍 My name is Philip and I am a machine learning (ML) engineer and a software developer living in Vancouver, Canada. Since you are here, let me tell you a bit about my story, stuff that I don't have on my resume.<br><br>" + 
-    "My journey into tech wasn’t a straight path. After graduating from the Sauder School of Business at UBC in 2016, I actually began my career as a marketing specialist at a SaaS company. " + 
-    "It was not a bad start — but over time, I discovered myself drawn to something more technical. Finding solutions to technical problems were extremely rewarding to me, more than anything else."+ 
-    " Back then, AI and machine learning weren’t nearly as mainstream as they are today, just starting to bloom. But that futuristic edge — the idea that machines could perceive, reason, and improve — completely fascinated me."+ 
-    " Eventually, I decided to follow that spark, leaving my marketing role to pursue a new direction in computer science and machine learning. It was a bumpy road, but in 2021, I successfully completed my Master’s degree in Computer Science at Simon Fraser University (SFU), specializing in Visual Computing. <br><br>" +
-    "Since then, I’ve been working in the machine learning industry, focusing on computer vision. I’m passionate about researching ML algorithms, and building ML-powered applications that bridge research and reality — solving real-world problems with data, algorithms, and a bit of creativity. <br><br>" +
-    "If you are interested in learning more about me or my past work, checkout my resume from above and feel free to get in touch with me.",
+    "My name is Philip, and I am a Machine Learning and MLOps Engineer based in Vancouver, Canada. Since you are here, let me tell you a bit about the journey behind the code—the side of my story that doesn’t fit cleanly onto a resume.<br><br>" +
+    "<strong>The Pivot: From Business to AI</strong><br>" +
+    "My path into technology wasn't linear. After graduating from the Sauder School of Business at UBC, I started out on the commercial side of tech. It didn't take long to realize that I was far more energized by building solutions to technical problems than managing marketing campaigns. I became fascinated by a futuristic edge that was just beginning to bloom: the idea that machines could perceive, reason, and learn from data.<br><br>" +
+    "Driven by that spark, I left my business career behind to rebuild my foundation from scratch. It was a rigorous transition, but it led me to complete my Master’s degree in Computer Science (Visual Computing) at Simon Fraser University.<br><br>" +
+    "<strong>The Evolution: Vision, Infrastructure, and Going Solo</strong><br>" +
+    "For years, my industry experience centered on computer vision and generative imagery—building end-to-end video pipelines, optimizing inference servers, and training custom GANs. But as the AI landscape evolved, I realized that true ML impact requires more than just training models; it requires robust, production-grade infrastructure to serve them. To bridge that gap, I focused heavily on advanced cloud architecture, culminating in becoming a certified Google Cloud Professional Cloud Architect.<br><br>" +
+    "<strong>What I'm Building Now: SotaVault 🚀</strong><br>" +
+    "Most recently, I spent six months taking everything I know about MLOps, LLMs, and cloud-native systems to build and launch my own product from scratch: <a href=\"https://sotavault.ai/\" target=\"_blank\" rel=\"noopener noreferrer\">SotaVault</a> (sotavault.ai).<br><br>" +
+    "SotaVault is a live, fully functional platform that brings structured transparency to the chaotic world of open-source machine learning benchmarks. Building it solo meant owning the entire stack:<br>" +
+    "<ul>" +
+    "<li>Designing an automated ingestion pipeline to parse academic metadata directly from arXiv PDFs.</li>" +
+    "<li>Architecting a low-latency semantic search layer using vector search in managed Firestore.</li>" +
+    "<li>Deploying a highly scalable backend on Google Kubernetes Engine (GKE) orchestrated entirely via Terraform.</li>" +
+    "<li>Optimizing high-throughput serving infrastructure for open-source LLM families like Qwen 3 and DeepSeek on local hardware.</li>" +
+    "</ul>" +
+    "I don't just write model code; I build the pipelines, scale the infrastructure, and deploy the final product to the world.",
   resume: "https://docs.google.com/document/d/13_PWdhThMr6roxb-UFiJj4YAFOj8e_bv3Vx9UHQdyBQ/edit?usp=sharing",
 };
 
@@ -118,7 +142,7 @@ const experiences = {
     {
       role: 'Machine Learning Developer',
       companylogo: require('../assets/img/mark.jpeg'),
-      date: 'Sep 2022 – Present',
+      date: 'Sep 2022 – Jan 2026',
     },
     
     {
@@ -134,4 +158,4 @@ const experiences = {
 //   show: false,
 // };
 
-export { navBar, mainBody, about, repos, skills, leadership, getInTouch, experiences };
+export { navBar, mainBody, sotaVault, about, repos, skills, leadership, getInTouch, experiences };

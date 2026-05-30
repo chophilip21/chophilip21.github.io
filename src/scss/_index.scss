@@ -131,3 +131,94 @@ code {
     animation: progress 1.5s ease-in-out forwards;
   }
 }
+
+$home-content-max-width: 56rem;
+
+.home-section-content {
+  max-width: $home-content-max-width;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.section-block {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.section-sotavault {
+  background-color: #eef3f8 !important;
+}
+
+.section-about {
+  background-color: #f8f7f4 !important;
+}
+
+.section-experiences {
+  background-color: #fff;
+}
+
+.section-projects {
+  background-color: #eceff4 !important;
+}
+
+.about-me-section {
+  .about-me-heading {
+    margin-bottom: 1.5rem;
+  }
+
+  .about-me-photo-wrap {
+    margin-bottom: 2rem;
+  }
+
+  .about-me-photo {
+    width: 11rem;
+    height: 11rem;
+    object-fit: cover;
+  }
+
+  .about-me-body {
+    max-width: $home-content-max-width;
+    margin: 0 auto;
+    text-align: left;
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    color: #343a40;
+
+    p {
+      margin-bottom: 0;
+    }
+
+    strong:first-of-type {
+      margin-top: 1.25rem;
+    }
+
+    strong {
+      display: block;
+      margin-top: 2rem;
+      margin-bottom: 0.65rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      line-height: 1.35;
+      color: #212529;
+    }
+
+    ul {
+      margin: 0.75rem 0 0;
+      padding-left: 1.35rem;
+    }
+
+    li {
+      margin-bottom: 0.65rem;
+      padding-left: 0.15rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    a {
+      font-weight: 500;
+      text-underline-offset: 2px;
+    }
+  }
+}

@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import {
   navBar,
   mainBody,
+  sotaVault,
   about,
   repos,
   leadership,
@@ -12,6 +13,7 @@ import {
 } from "./editable-stuff/config.js";
 import MainBody from "./components/home/MainBody";
 import AboutMe from "./components/home/AboutMe";
+import SotaVault from "./components/home/SotaVault";
 import Project from "./components/home/Project";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
@@ -33,6 +35,15 @@ const Home = React.forwardRef((props, ref) => {
         icons={mainBody.icons}
         ref={ref}
       />
+      {sotaVault.show && (
+        <SotaVault
+          heading={sotaVault.heading}
+          logoSrc={sotaVault.logoSrc}
+          description={sotaVault.description}
+          highlights={sotaVault.highlights}
+          websiteUrl={sotaVault.websiteUrl}
+        />
+      )}
       {about.show && (
         <AboutMe
           heading={about.heading}
